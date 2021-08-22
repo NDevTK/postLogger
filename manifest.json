@@ -1,0 +1,20 @@
+{
+  "name": "postLogger",
+  "version": "1.0",
+  "description": "Extension to log postMessage()",
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "ContentScript.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "tabs"
+  ]
+  "manifest_version": 2
+}
