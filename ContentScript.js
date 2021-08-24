@@ -1,2 +1,6 @@
 'use strict';
-window.addEventListener("message", console.info);
+var script = document.createElement('script');
+script.setAttribute('type', 'text/javascript');
+script.setAttribute('crossorigin', 'anonymous');
+script.setAttribute('src', chrome.runtime.getURL('WindowScript.js'));
+document.head.appendChild(script);
