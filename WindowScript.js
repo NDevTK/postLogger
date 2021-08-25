@@ -54,9 +54,9 @@ function hookWindow(w) {
 hookWindow(window);
 
 function hook(data, type) {
-  if (target.postLoggerType === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
-  if (target.postLoggerType === "opener" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
-  if (target.postLoggerType === "opener") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
-  if (target.postLoggerType === "parent" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
-  if (target.postLoggerType === "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
+  if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
+  if (type === "opener" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
+  if (type === "opener") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
+  if (type === "parent" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
+  if (type=== "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
 }
