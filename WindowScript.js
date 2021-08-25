@@ -7,7 +7,7 @@ function handle(type, key = "postMessage") {
       return function() {
         hook(arguments, type);
         let result = target[property].apply(target, arguments);
-        hookWindow(result.source);
+        if (result.source) hookWindow(result.source);
         return result;
       }
     },
