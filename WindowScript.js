@@ -23,7 +23,7 @@ function hookWindow(w) {
       w.opener = new Proxy(real, handler);
       windows.set(real, w);
     }
-    real.postLoggerType = "opener;
+    real.postLoggerType = "opener";
   }
   
   if (w.parent) {
@@ -34,7 +34,7 @@ function hookWindow(w) {
       w.parent = new Proxy(real, handler);
       windows.set(real, w);
     }
-    real.postLoggerType = "parent;
+    real.postLoggerType = "parent";
   }
   
   if (w) {
