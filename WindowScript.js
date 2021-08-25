@@ -23,8 +23,8 @@ window.postMessage = function() {
 
 function hook(data, target) {
   if (target === window) return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
-  if (target === window.opener && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
-  if (target === window.opener) return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
-  if (target === window.parent && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
-  if (target === window.parent) return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
+  if (target === realOpener && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
+  if (target === realOpener) return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
+  if (target === realParent && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
+  if (target === realParent) return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
 }
