@@ -1,3 +1,7 @@
+// Code here is exposed to the website.
+(function() {
+'use strict';
+
 const windows = new Map();
 
 function handle(type, key = "postMessage") {
@@ -60,3 +64,5 @@ function hook(data, type) {
   if (type === "parent" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
   if (type=== "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
 }
+
+})();
