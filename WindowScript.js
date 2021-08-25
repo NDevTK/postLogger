@@ -2,7 +2,7 @@ const windows = new Map();
 
 function handle(type, key = "postMessage") {
   return {
-    get: function(target, key) {
+    get: function(target, property) {
       if (property !== key) return target[property];
       return function() {
         hook(arguments, type);
