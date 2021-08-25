@@ -1,16 +1,18 @@
 const windows = new Map();
 
-const handler = {
-  get: function(target, property) {
-    if (property !== "postMessage") return target[property];
-    return function() {
-      hook(arguments, target);
-      let result = target[property].apply(target, arguments);
-      hookWindow(result.source);
-      return result;
-    }
-  },
-};
+function handle(type, key = "postMessage") {
+  return {
+    get: function(target, key) {
+      if (property !== key) return target[property];
+      return function() {
+        hook(arguments, type);
+        let result = target[property].apply(target, arguments);
+        hookWindow(result.source);
+        return result;
+      }
+    },
+  };
+}
 
 function hookWindow(w) {
   if (!w) return;
@@ -20,10 +22,9 @@ function hookWindow(w) {
     if (windows.has(real)) {
       w.opener = windows.get(real);
     } else {
-      w.opener = new Proxy(real, handler);
+      w.opener = new Proxy(real, handle("opener"));
       windows.set(real, w);
     }
-    real.postLoggerType = "opener";
   }
   
   if (w.parent) {
@@ -31,10 +32,9 @@ function hookWindow(w) {
     if (windows.has(real)) {
       w.parent = windows.get(real);
     } else {
-      w.parent = new Proxy(real, handler);
+      w.parent = new Proxy(real, handle("parent"));
       windows.set(real, w);
     }
-    real.postLoggerType = "parent";
   }
   
   if (w) {
@@ -43,18 +43,17 @@ function hookWindow(w) {
       w.postMessage = windows.get(real);
     } else {
       w.postMessage = function() {
-        hook(arguments);
+        hook(arguments, "self");
         real.apply(this, arguments);
       }
       windows.set(real, w);
     }
-    real.postLoggerType = "self;
   }
 }
 
 hookWindow(window);
 
-function hook(data, target) {
+function hook(data, type) {
   if (target.postLoggerType === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
   if (target.postLoggerType === "opener" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
   if (target.postLoggerType === "opener") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
