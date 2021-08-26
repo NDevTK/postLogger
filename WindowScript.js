@@ -11,7 +11,7 @@ function handle(type) {
       return function() {
         hook(arguments, type);
         let result = target[property].apply(target, arguments);
-        if (hasProperty(result, "source")) hookWindow(result.source);
+        if (hasProperty(result, "source")) hookWindows(result.source);
         return result;
       }
     },
@@ -19,31 +19,27 @@ function handle(type) {
 }
 
 function hasProperty(value, key) {
-  return Object.prototype.hasOwnProperty.call(value, key);
+  return (Object.prototype.hasOwnProperty.call(value, key) && value[key]);
 }
 
-function hookWindow(w) {
+function hookWindow(w, p) {
+  if (hasProperty(w, p)) {
+    if (!(w[p] instanceof Window)) return;
+    let real = w[p];
+    if (windows.has(real)) {
+      w[p] = windows.get(real);
+    } else {
+      w[p] = new Proxy(real, handle(p));
+      windows.set(real, w);
+    }
+  }
+}
+  
+function hookWindows(w) {
   if (!(w instanceof Window)) return;
   
-  if (hasProperty(w, "opener")) {
-    let real = w.opener;
-    if (windows.has(real)) {
-      w.opener = windows.get(real);
-    } else {
-      w.opener = new Proxy(real, handle("opener"));
-      windows.set(real, w);
-    }
-  }
-  
-  if (hasProperty(w, "parent")) {
-    let real = w.parent;
-    if (windows.has(real)) {
-      w.parent = windows.get(real);
-    } else {
-      w.parent = new Proxy(real, handle("parent"));
-      windows.set(real, w);
-    }
-  }
+  hookWindow(w, "parent");
+  hookWindow(w, "opener");
   
   if (hasProperty(w, "postMessage")) {
     let real = w.postMessage;
@@ -59,7 +55,7 @@ function hookWindow(w) {
   }
 }
 
-hookWindow(window);
+hookWindows(window);
 
 function hook(data, type) {
   if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
