@@ -4,10 +4,10 @@
 
 const windows = new Map();
 
-function handle(type, key = "postMessage") {
+function handle(type) {
   return {
     get: function(target, property) {
-      if (property !== key) return target[property];
+      if (property !== "postMessage") return target[property];
       return function() {
         hook(arguments, type);
         let result = target[property].apply(target, arguments);
