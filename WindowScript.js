@@ -11,11 +11,15 @@ function handle(type) {
       return function() {
         hook(arguments, type);
         let result = target[property].apply(target, arguments);
-        if (result.source) hookWindow(result.source);
+        if (hasProperty(result, "source")) hookWindow(result.source);
         return result;
       }
     },
   };
+}
+
+function hasProperty(value, key) {
+  return Object.prototype.hasOwnProperty.call(value, key);
 }
 
 function hookWindow(w) {
