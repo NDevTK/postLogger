@@ -25,7 +25,7 @@ function hasProperty(value, key) {
 function hookWindow(w) {
   if (!(w instanceof Window)) return;
   
-  if (w.opener) {
+  if (hasProperty(w, "opener")) {
     let real = w.opener;
     if (windows.has(real)) {
       w.opener = windows.get(real);
@@ -35,7 +35,7 @@ function hookWindow(w) {
     }
   }
   
-  if (w.parent) {
+  if (hasProperty(w, "parent")) {
     let real = w.parent;
     if (windows.has(real)) {
       w.parent = windows.get(real);
@@ -45,7 +45,7 @@ function hookWindow(w) {
     }
   }
   
-  if (w) {
+  if (hasProperty(w, "postMessage")) {
     let real = w.postMessage;
     if (windows.has(real)) {
       w.postMessage = windows.get(real);
