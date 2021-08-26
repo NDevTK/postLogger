@@ -19,7 +19,7 @@ function handle(type) {
 }
 
 function hookWindow(w) {
-  if !(w instanceof Window) return;
+  if (!(w instanceof Window)) return;
   
   if (w.opener) {
     let real = w.opener;
