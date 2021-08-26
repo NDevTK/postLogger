@@ -19,7 +19,7 @@ function handle(type) {
 }
 
 function hasProperty(value, key) {
-  return (Object.prototype.hasOwnProperty.call(value, key) && value[key]);
+  return Object.prototype.hasOwnProperty.call(value, key);
 }
 
 function hookWindow(w, p) {
