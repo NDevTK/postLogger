@@ -22,23 +22,28 @@ function hasProperty(value, key) {
   return Object.prototype.hasOwnProperty.call(value, key);
 }
 
-function hookProperty(w, p) {
-  if (hasProperty(w, p)) {
-    let real = w[p];
-    if (windows.has(real)) {
-      w[p] = windows.get(real);
-    } else {
-      w[p] = new Proxy(real, handle(p));
-      windows.set(real, w);
-    }
-  }
-}
-  
 function hookWindow(w) {
   if (!(w instanceof Window)) return;
   
-  hookProperty(w, "parent");
-  hookProperty(w, "opener");
+  if (hasProperty(w, "opener")) {
+    let real = w.opener;
+    if (windows.has(real)) {
+      w.opener = windows.get(real);
+    } else {
+      w.opener = new Proxy(real, handle("opener"));
+      windows.set(real, w);
+    }
+  }
+  
+  if (hasProperty(w, "parent")) {
+    let real = w.parent;
+    if (windows.has(real)) {
+      w.parent = windows.get(real);
+    } else {
+      w.parent = new Proxy(real, handle("parent"));
+      windows.set(real, w);
+    }
+  }
   
   if (hasProperty(w, "postMessage")) {
     let real = w.postMessage;
