@@ -19,7 +19,7 @@ function handle(type, key = "postMessage") {
 }
 
 function hookWindow(w) {
-  if (!w) return;
+  if !(w instanceof Window) return;
   
   if (w.opener) {
     let real = w.opener;
