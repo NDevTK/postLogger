@@ -41,13 +41,9 @@ function hookWindows(w) {
   hookWindow(w, "parent");
   hookWindow(w, "opener");
 
-  // Hook frames created by this window
+  // Hook iframes created by this window
   setInterval(() => {
-      try {
-        for (var i = 0; i < w.frames.length; i++) {
-          hookWindow(w, i);
-        }
-      } catch(e) {}
+    [...w.document.getElementsByTagName('iframe')].forEach(frame => { hookWindow(frame, 'contentWindow') });
   }, 10);
 
   if (hasProperty(w, "postMessage")) {
