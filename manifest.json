@@ -14,6 +14,11 @@
       ]
     }
   ],
-  "web_accessible_resources": ["WindowScript.js"],
+  "web_accessible_resources": [
+    {
+      "resources": [ "WindowScript.js" ],
+      "matches": [ "<all_urls>" ]
+    }
+  ],
   "manifest_version": 3
 }
