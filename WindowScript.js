@@ -34,13 +34,22 @@ function hookWindow(w, p) {
     }
   }
 }
-  
+
 function hookWindows(w) {
   if (!(w instanceof Window)) return;
-  
+
   hookWindow(w, "parent");
   hookWindow(w, "opener");
-  
+
+  // Hook frames created by this window
+  setInterval(() => {
+      try {
+        for (var i = 0; i < w.frames.length; i++) {
+          hookWindow(w, i);
+        }
+      } catch(e) {}
+  }, 10);
+
   if (hasProperty(w, "postMessage")) {
     let real = w.postMessage;
     if (windows.has(real)) {
