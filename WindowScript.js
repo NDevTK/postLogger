@@ -41,11 +41,6 @@ function hookWindows(w) {
   hookWindow(w, "parent");
   hookWindow(w, "opener");
 
-  // Hook iframes created by this window
-  setInterval(() => {
-    [...w.document.getElementsByTagName('iframe')].forEach(frame => { hookWindow(frame, 'contentWindow') });
-  }, 10);
-
   if (hasProperty(w, "postMessage")) {
     let real = w.postMessage;
     if (windows.has(real)) {
