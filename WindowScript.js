@@ -55,7 +55,7 @@ function hook(item) {
 }
  
 for (let item in window) {
-  hook(item);
+  hook(window[item]);
 }
 
 function result(data, type) {
