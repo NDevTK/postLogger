@@ -3,9 +3,10 @@
 'use strict';
 
 const windows = new Map();
-
+const iframes = new Set();
+ 
 function hookIframe(iframe) {
-  if (windows.has(iframe)) return;
+  if (iframes.has(iframe)) return;
   const iframeProxy = {
     get(target, prop, receiver) {
       let result = Reflect.get(...arguments);
@@ -14,7 +15,7 @@ function hookIframe(iframe) {
     },
   };
   iframe.__proto__ = new Proxy(iframe.__proto__, iframeProxy);
-  windows.add(iframe);
+  iframes.add(iframe);
 }
 
 setInterval(() => {
