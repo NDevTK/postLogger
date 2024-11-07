@@ -38,9 +38,7 @@ function postMessageShim(real, target, message, scope) {
   real.apply(this, arguments);
 }
 
-function hook(item) {
-  if (!item) return;
-  
+function hook(item) {  
   // Try to modify the prototype
   try {
     let realProto = item.__proto__;
@@ -57,7 +55,9 @@ function hook(item) {
 }
  
 for (let item in window) {
-  hook(window[item]);
+  try {
+    hook(window[item]);
+  } catch {}
 }
 
 function result(data, type) {
