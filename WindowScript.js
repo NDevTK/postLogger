@@ -34,9 +34,15 @@ function handle() {
 }
 
 function hook(item) {
+  // Try to modify the prototype
   try {
-    let real = item.__proto__;
-    item.__proto__ = new Proxy(real, handle);
+    let realProto = item.__proto__;
+    item.__proto__ = new Proxy(realProto, handle);
+  } catch {}
+  // Try to modify the item directly
+  try {
+    let real = item;
+    item = new Proxy(real, handle);
   } catch {}
 }
 
