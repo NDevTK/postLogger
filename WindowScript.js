@@ -2,60 +2,43 @@
 (function() {
 'use strict';
 
-const windows = new Map();
+function whoami(w) {
+  if (w === window.parent) return 'parent';
+  if (w === window.opener) return 'opener';
+  if (w === self) return 'self';
+  return 'other';
+}
 
-function handle(type) {
+function handle() {
   return {
     get: function(target, property) {
-      if (property !== "postMessage") return target[property];
-      return function() {
-        hook(arguments, type);
-        let result = target[property].apply(target, arguments);
-        if (hasProperty(result, "source")) hookWindows(result.source);
-        return result;
+      let result = Reflect.get(...arguments);
+      
+      if (property === "postMessage") {
+        return hook(arguments, whoami(target));
       }
+      
+      if (property === "postLogger") {
+        return true;
+      }
+      
+      if (result.postLogger) return result;
+      return new Proxy(result, handle);
     },
-  };
-}
-
-function hasProperty(value, key) {
-  return Object.prototype.hasOwnProperty.call(value, key);
-}
-
-function hookWindow(w, p) {
-  if (hasProperty(w, p)) {
-    if (!(w[p] instanceof Window)) return;
-    let real = w[p];
-    if (windows.has(real)) {
-      w[p] = windows.get(real);
-    } else {
-      w[p] = new Proxy(real, handle(p));
-      windows.set(real, w);
-    }
+    set: function(target, property, value) {
+      // Websites should not change this value.
+      if (property === 'postLogger') return true;
+      return Reflect.set(...arguments);
+    }, 
   }
 }
 
-function hookWindows(w) {
-  if (!(w instanceof Window)) return;
-
-  hookWindow(w, "parent");
-  hookWindow(w, "opener");
-
-  if (hasProperty(w, "postMessage")) {
-    let real = w.postMessage;
-    if (windows.has(real)) {
-      w.postMessage = windows.get(real);
-    } else {
-      w.postMessage = function() {
-        hook(arguments, "self");
-        real.apply(this, arguments);
-      }
-      windows.set(real, w);
-    }
-  }
+function hookProto(win) {
+  let real = win.__proto__;
+  win.__proto__ = new Proxy(real, handle);
 }
 
-hookWindows(window);
+hookProto(window);
 
 function hook(data, type) {
   if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
