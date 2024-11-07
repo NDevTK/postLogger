@@ -38,11 +38,6 @@ function handle() {
   }
 }
 
-function postMessageShim(target) {
-  result(arguments, whoami(target));
-  Reflect.get(...arguments);
-}
-
 function hook(name) {  
   let item = window[name];
   // Try to modify the prototype
