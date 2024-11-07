@@ -46,11 +46,12 @@ function hook(item) {
   } catch {}
   
   if (item.postMessage) {
-      // Try to add postMessageShim
-      let real = item.postMessage;
-      item = postMessageShim(real, item);
-    }
-  } catch {}
+    // Try to add postMessageShim
+    try {
+    let real = item.postMessage;
+    item = postMessageShim(real, item);
+    } catch {}
+  }
 }
  
 for (let item in window) {
