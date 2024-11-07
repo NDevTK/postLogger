@@ -33,23 +33,29 @@ function handle() {
   }
 }
 
+function postMessageShim(real, target, message, scope) {
+  result(arguments, whoami(target));
+  real.apply(this, arguments);
+}
+
 function hook(item) {
   // Try to modify the prototype
   try {
     let realProto = item.__proto__;
     item.__proto__ = new Proxy(realProto, handle);
   } catch {}
-  // Try to modify the item directly
-  try {
-    let real = item;
-    item = new Proxy(real, handle);
+  
+  if (item.postMessage) {
+      // Try to add postMessageShim
+      let real = item.postMessage;
+      item = postMessageShim(real, item);
+    }
   } catch {}
 }
-
-hook(window.postMessage);
-hook(window.parent?.postMessage);
-hook(window.opener?.postMessage);
-hook(window.document);
+ 
+for (let item in window) {
+  hook(item);
+}
 
 function result(data, type) {
   if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
