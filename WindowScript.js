@@ -39,6 +39,8 @@ function postMessageShim(real, target, message, scope) {
 }
 
 function hook(item) {
+  if (!item) return;
+  
   // Try to modify the prototype
   try {
     let realProto = item.__proto__;
