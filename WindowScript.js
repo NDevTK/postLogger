@@ -12,10 +12,12 @@ function whoami(w) {
 function handle() {
   return {
     get: function(target, property) {
-      let result = Reflect.get(...arguments);
       
       if (property === "postMessage") {
-        return postMessageShim(target);
+        return function() {
+          result(arguments, whoami(target));
+          Reflect.get(...arguments);
+        }
       }
       
       if (property === "postLogger") {
