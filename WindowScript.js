@@ -28,8 +28,7 @@ function handle(type) {
       if (property !== "postMessage") return target[property];
       return function() {
         hook(arguments, type);
-        let result = target[property].apply(target, arguments);
-        return result;
+        return target[property].apply(target, arguments);
       }
     },
   };
