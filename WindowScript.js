@@ -37,15 +37,13 @@ function hook(item) {
   try {
     let real = item.__proto__;
     item.__proto__ = new Proxy(real, handle);
-  } catch {
-    console.error('Unable to hook: ' + item);
-  }
+  } catch {}
 }
 
-hook(window.postMessage);
-hook(window.parent.postMessage);
-hook(window.opener.postMessage);
-hook(window.document);
+hook(window.postMessage?);
+hook(window.parent?.postMessage?);
+hook(window.opener?.postMessage?);
+hook(window.document?);
 
 function result(data, type) {
   if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
