@@ -44,14 +44,8 @@ function hook(item) {
     let realProto = item.__proto__;
     item.__proto__ = new Proxy(realProto, handle);
   } catch {}
-  
-  if (item.postMessage) {
-    // Try to add postMessageShim
-    try {
-    let real = item.postMessage;
-    item = postMessageShim(real, item);
-    } catch {}
-  }
+  let real = item;
+  item = new Proxy(real, handle);
 }
  
 for (let item in window) {
