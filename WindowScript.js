@@ -29,7 +29,6 @@ function handle(type) {
       return function() {
         hook(arguments, type);
         let result = target[property].apply(target, arguments);
-        if (hasProperty(result, "source")) hookWindows(result.source);
         return result;
       }
     },
