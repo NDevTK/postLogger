@@ -15,7 +15,7 @@ function handle() {
       let result = Reflect.get(...arguments);
       
       if (property === "postMessage") {
-        return hook(arguments, whoami(target));
+        return result(arguments, whoami(target));
       }
       
       if (property === "postLogger") {
@@ -33,19 +33,28 @@ function handle() {
   }
 }
 
-function hookProto(win) {
-  let real = win.__proto__;
-  win.__proto__ = new Proxy(real, handle);
+function hook(item) {
+  try {
+    let real = item.__proto__;
+    item.__proto__ = new Proxy(real, handle);
+  } catch {
+    console.error('Unable to hook: ' + item);
+  }
 }
 
-hookProto(window);
+hook(window.postMessage);
+hook(window.parent.postMessage);
+hook(window.opener.postMessage);
+hook(window.document);
 
-function hook(data, type) {
+function result(data, type) {
   if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
   if (type === "opener" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
   if (type === "opener") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
   if (type === "parent" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
-  if (type=== "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
+  if (type === "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
+  if (type === "other" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to other");
+  if (type === "other") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to other");
 }
 
 })();
