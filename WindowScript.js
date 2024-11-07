@@ -17,7 +17,7 @@ function handle() {
       if (property === "postMessage") {
         return function() {
           result(arguments, whoami(target));
-          Reflect.get(...arguments);
+          return item;
         }
       }
       
@@ -26,7 +26,7 @@ function handle() {
       }
       
       if (item.postLogger) {
-        return Reflect.get(...arguments);
+        return item;
       }
       
       return new Proxy(item, handle);
