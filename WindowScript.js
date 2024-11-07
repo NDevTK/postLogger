@@ -12,6 +12,7 @@ function whoami(w) {
 function handle() {
   return {
     get: function(target, property) {
+      let item = Reflect.get(...arguments);
       
       if (property === "postMessage") {
         return function() {
@@ -24,11 +25,11 @@ function handle() {
         return true;
       }
       
-      if (result.postLogger) {
+      if (item.postLogger) {
         return Reflect.get(...arguments);
       }
       
-      return new Proxy(result, handle);
+      return new Proxy(item, handle);
     },
     set: function(target, property, value) {
       // Websites should not change this value.
