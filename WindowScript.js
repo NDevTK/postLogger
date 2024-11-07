@@ -15,14 +15,17 @@ function handle() {
       let result = Reflect.get(...arguments);
       
       if (property === "postMessage") {
-        return result(arguments, whoami(target));
+        return postMessageShim(target);
       }
       
       if (property === "postLogger") {
         return true;
       }
       
-      if (result.postLogger) return result;
+      if (result.postLogger) {
+        return Reflect.get(...arguments);
+      }
+      
       return new Proxy(result, handle);
     },
     set: function(target, property, value) {
@@ -33,24 +36,24 @@ function handle() {
   }
 }
 
-function postMessageShim(real, target, message, scope) {
+function postMessageShim(target) {
   result(arguments, whoami(target));
-  real.apply(this, arguments);
+  Reflect.get(...arguments);
 }
 
-function hook(item) {  
+function hook(name) {  
+  let item = window[name];
   // Try to modify the prototype
   try {
     let realProto = item.__proto__;
-    item.__proto__ = new Proxy(realProto, handle);
+    window[name].__proto__ = new Proxy(realProto, handle);
   } catch {}
-  let real = item;
-  item = new Proxy(real, handle);
+  window[name] = new Proxy(item, handle);
 }
  
-for (let item in window) {
+for (let name in window) {
   try {
-    hook(window[item]);
+    hook(name);
   } catch {}
 }
 
