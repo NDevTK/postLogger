@@ -2,67 +2,67 @@
 (function() {
 'use strict';
 
-function whoami(w) {
-  if (w === window.parent) return 'parent';
-  if (w === window.opener) return 'opener';
-  if (w === self) return 'self';
-  return 'other';
-}
+const windows = new Map();
 
-function handle() {
+function handle(type) {
   return {
     get: function(target, property) {
-      let item = Reflect.get(...arguments);
-      
-      if (property === "postMessage") {
-        return function() {
-          result(arguments, whoami(target));
-          return item;
-        }
+      if (property !== "postMessage") return target[property];
+      return function() {
+        hook(arguments, type);
+        let result = target[property].apply(target, arguments);
+        if (hasProperty(result, "source")) hookWindows(result.source);
+        return result;
       }
-      
-      if (property === "postLogger") {
-        return true;
-      }
-      
-      if (item.postLogger) {
-        return item;
-      }
-      
-      return new Proxy(item, handle);
     },
-    set: function(target, property, value) {
-      // Websites should not change this value.
-      if (property === 'postLogger') return true;
-      return Reflect.set(...arguments);
-    }, 
+  };
+}
+
+function hasProperty(value, key) {
+  return Object.prototype.hasOwnProperty.call(value, key);
+}
+
+function hookWindow(w, p) {
+  if (hasProperty(w, p)) {
+    if (!(w[p] instanceof Window)) return;
+    let real = w[p];
+    if (windows.has(real)) {
+      w[p] = windows.get(real);
+    } else {
+      w[p] = new Proxy(real, handle(p));
+      windows.set(real, w);
+    }
   }
 }
 
-function hook(name) {  
-  let item = window[name];
-  // Try to modify the prototype
-  try {
-    let realProto = item.__proto__;
-    window[name].__proto__ = new Proxy(realProto, handle);
-  } catch {}
-  window[name] = new Proxy(item, handle);
-}
- 
-for (let name in window) {
-  try {
-    hook(name);
-  } catch {}
+function hookWindows(w) {
+  if (!(w instanceof Window)) return;
+
+  hookWindow(w, "parent");
+  hookWindow(w, "opener");
+
+  if (hasProperty(w, "postMessage")) {
+    let real = w.postMessage;
+    if (windows.has(real)) {
+      w.postMessage = windows.get(real);
+    } else {
+      w.postMessage = function() {
+        hook(arguments, "self");
+        real.apply(this, arguments);
+      }
+      windows.set(real, w);
+    }
+  }
 }
 
-function result(data, type) {
+hookWindows(window);
+
+function hook(data, type) {
   if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
   if (type === "opener" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
   if (type === "opener") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
   if (type === "parent" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
-  if (type === "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
-  if (type === "other" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to other");
-  if (type === "other") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to other");
+  if (type=== "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
 }
 
 })();
