@@ -2,6 +2,8 @@
 (function() {
 'use strict';
 
+window.addEventListener("message", e => console.info(location.origin, "received", e.data, "from origin", e.origin));
+
 const windows = new Map();
 const iframes = new Set();
  
