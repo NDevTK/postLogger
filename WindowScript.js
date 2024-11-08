@@ -71,7 +71,7 @@
         };
     }
 
-    window.parent = new Proxy(real, handle('parent'));
-    window.opener = new Proxy(real, handle('opener'));
-    window.postMessage = new Proxy(real, handle('self'));
+    window.parent = new Proxy(window.parent, handle('parent'));
+    window.opener = new Proxy(window.opener, handle('opener'));
+    window.postMessage = new Proxy(window.postMessage, handle('self'));
 })();
