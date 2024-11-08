@@ -13,7 +13,7 @@ function hookIframe(iframe) {
     get(target, prop, receiver) {
       let result = Reflect.get(...arguments);
       if (prop !== 'contentWindow') return result;
-      return new Proxy(result, handle('iframe'));
+      return new Proxy(result, handle('iframe', iframe));
     },
   };
   iframe.__proto__ = new Proxy(iframe.__proto__, iframeProxy);
@@ -24,12 +24,12 @@ setInterval(() => {
   document.querySelectorAll('iframe').forEach(hookIframe);
 }, 100);
 
-function handle(type) {
+function handle(type, iframe) {
   return {
     get: function(target, property) {
       if (property !== "postMessage") return Reflect.get(...arguments);
       return function() {
-        hook(arguments, type);
+        hook(arguments, type, iframe);
         return target[property].apply(target, arguments);
       }
     },
@@ -79,8 +79,8 @@ function hook(data, type) {
   if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
   if (type === "opener" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
   if (type === "opener") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
-  if (type === "iframe" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to iframe");
-  if (type === "iframe") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to iframe");
+  if (type === "iframe" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to iframe", iframe);
+  if (type === "iframe") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to iframe", iframe);
   if (type === "parent" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
   if (type=== "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
 }
