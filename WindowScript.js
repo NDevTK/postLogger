@@ -75,7 +75,7 @@ function hookWindows(w) {
 
 hookWindows(window);
 
-function hook(data, type) {
+function hook(data, type, iframe) {
   if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
   if (type === "opener" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
   if (type === "opener") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
