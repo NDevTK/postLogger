@@ -2,7 +2,6 @@
 (function() {
     'use strict';
 
-    const windows = new Map();
     const iframes = new Set();
 
     function whois(win, origin) {
@@ -72,42 +71,9 @@
         };
     }
 
-    function hasProperty(value, key) {
-        return Object.prototype.hasOwnProperty.call(value, key);
-    }
-
-    function hookWindow(w, p) {
-        if (hasProperty(w, p)) {
-            if (!(w[p] instanceof Window)) return;
-            let real = w[p];
-            if (windows.has(real)) {
-                w[p] = windows.get(real);
-            } else {
-                w[p] = new Proxy(real, handle(p));
-                windows.set(real, w);
-            }
-        }
-    }
-
-    function hookWindows(w) {
-        if (!(w instanceof Window)) return;
-
-        hookWindow(w, "parent");
-        hookWindow(w, "opener");
-
-        if (hasProperty(w, "postMessage")) {
-            let real = w.postMessage;
-            if (windows.has(real)) {
-                w.postMessage = windows.get(real);
-            } else {
-                w.postMessage = function() {
-                    hook(arguments, "self");
-                    real.apply(this, arguments);
-                }
-                windows.set(real, w);
-            }
-        }
-    }
+    window.parent = new Proxy(real, handle('parent'));
+    window.opener = new Proxy(real, handle('opener'));
+    window.postMessage = new Proxy(real, handle('self'));
 
     hookWindows(window);
 
