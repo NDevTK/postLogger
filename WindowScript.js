@@ -20,12 +20,12 @@ function handle(type) {
     get: function(target, property) {
      const result = Reflect.get(...arguments);
      if (property === 'isProxy') return true;
-     if (typeof property == 'undefined') return;
-     if (!property.isProxy && typeof property === 'object') target[key] = new Proxy(result, handle(type));
+     if (typeof result == 'undefined') return;
+     if (!result.isProxy && typeof result === 'object') target[key] = new Proxy(result, handle(type));
      if (property !== 'postMessage') return result;
       return function() {
         hook(arguments, type);
-        return result.apply(target, arguments);
+        return result;
       }
     },
   };
