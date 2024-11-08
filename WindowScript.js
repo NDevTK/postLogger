@@ -2,7 +2,7 @@
 (function() {
     'use strict';
 
-    const iframes = new Set();
+    const iframes = new WeakSet();
 
     function whois(win, origin) {
         if (win === window.top) return 'top (' + origin + ')';
