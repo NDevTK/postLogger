@@ -41,6 +41,7 @@
     });
 
     function hookIframe(iframe) {
+        // Keep track of iframe usage to avoid repetitive proxy creation.
         if (iframes.has(iframe)) return;
         const iframeProxy = {
             get(target, prop, receiver) {
