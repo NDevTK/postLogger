@@ -6,7 +6,6 @@ const windows = new Map();
 const iframes = new Set();
 
 function whois(win, origin) {
- if (win === window) return 'self (' + origin + ')';
  if (win === window.top) return 'top (' + origin + ')';
  if (win === window.parent) return 'parent (' + origin + ')';
  if (win === window.opener) return 'opener (' + origin + ')';
