@@ -3,20 +3,23 @@
     'use strict';
 
     const iframes = new WeakSet();
-
+    
+    const realOpener = window.opener;
+    const realParent = window.parent;
+    
     function whois(win, origin) {
         if (win === window.top) return 'top (' + origin + ')';
-        if (win === window.parent && win !== window) return 'parent (' + origin + ')';
-        if (win === window.opener) return 'opener (' + origin + ')';
+        if (win === realParent && win !== window) return 'parent (' + origin + ')';
+        if (win === realOpener) return 'opener (' + origin + ')';
 
-        if (win.opener === window && win === win.top) return 'popup (' + origin + ')';
-        if (win.opener === window && win !== win.top) return 'popup iframe (' + origin + ')';
+        if (realOpener === window && win === win.top) return 'popup (' + origin + ')';
+        if (realOpener === window && win !== win.top) return 'popup iframe (' + origin + ')';
 
-        if (win.opener?.opener === window) return 'opener of opener (' + origin + ')';
-        if (win.opener?.parent === window && win.opener?.parent !== win.opener) return 'parent of opener (' + origin + ')';
+        if (realOpener?.opener === window) return 'opener of opener (' + origin + ')';
+        if (realOpener?.parent === window && realOpener?.parent !== realOpener) return 'parent of opener (' + origin + ')';
 
-        if (win.top === window.top && win.parent !== window.top) return 'nested iframe (' + origin + ')';
-        if (win.top === window.top && win.parent === window.top) return 'iframe (' + origin + ')';
+        if (win.top === window.top && realParent !== window.top) return 'nested iframe (' + origin + ')';
+        if (win.top === window.top && realParent === window.top) return 'iframe (' + origin + ')';
         return 'other (' + origin + ')';
     }
 
