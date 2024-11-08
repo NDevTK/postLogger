@@ -6,18 +6,15 @@
     {
       "all_frames": true,
       "run_at": "document_start",
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
       "matches": [
         "<all_urls>"
       ],
       "js": [
-        "ContentScript.js"
-      ]
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": [ "WindowScript.js" ],
-      "matches": [ "<all_urls>" ]
+        "WindowScript.js"
+      ],
+      "world": "MAIN"
     }
   ],
   "manifest_version": 3
