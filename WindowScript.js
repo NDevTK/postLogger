@@ -73,11 +73,11 @@
     }
     
     if (window.parent !== window) {
-        window.parent = new Proxy(window.parent, handle('parent'));
+        window.parent.postMessage = new Proxy(window.parent.postMessage, handle('parent'));
     }
     
     if (window.opener) {
-        window.opener = new Proxy(window.opener, handle('opener'));
+        window.opener.postMessage = new Proxy(window.opener.postMessage, handle('opener'));
     }
     
     window.postMessage = new Proxy(window.postMessage, handle('self'));
