@@ -2,11 +2,22 @@
 (function() {
 'use strict';
 
-window.addEventListener("message", e => console.info(location.origin, "received", e.data, "from origin", e.origin));
-
 const windows = new Map();
 const iframes = new Set();
- 
+
+function whois(win, origin) {
+ if (win === window.top) return 'top (' + origin + ')';
+ if (win === window.parent) return 'parent (' + origin + ')';
+ if (win === window.opener) return 'opener (' + origin + ')';
+ return 'other (' + origin + ')';
+}
+
+const me = whois(window, window.origin);
+
+window.addEventListener("message", e => {
+ console.info(me, "received", e.data, "from ", whois(e.source, e.origin));
+};
+
 function hookIframe(iframe) {
   if (iframes.has(iframe)) return;
   const iframeProxy = {
@@ -76,13 +87,13 @@ function hookWindows(w) {
 hookWindows(window);
 
 function hook(data, type, iframe) {
-  if (type === "self") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to self");
-  if (type === "opener" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to opener");
-  if (type === "opener") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to opener");
-  if (type === "iframe" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to iframe", iframe);
-  if (type === "iframe") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to iframe", iframe);
-  if (type === "parent" && data[1] === "*") return console.warn(location.origin, "sent", data[0], "with scope", data[1], "to parent");
-  if (type=== "parent") return console.info(location.origin, "sent", data[0], "with scope", data[1], "to parent");
+  if (type === "self") return console.info(me, "sent", data[0], "with scope", data[1], "to self");
+  if (type === "opener" && data[1] === "*") return console.warn(sender, "sent", data[0], "with scope", data[1], "to opener");
+  if (type === "opener") return console.info(me, "sent", data[0], "with scope", data[1], "to opener");
+  if (type === "iframe" && data[1] === "*") return console.warn(sender, "sent", data[0], "with scope", data[1], "to iframe", iframe);
+  if (type === "iframe") return console.info(me, "sent", data[0], "with scope", data[1], "to iframe", iframe);
+  if (type === "parent" && data[1] === "*") return console.warn(sender, "sent", data[0], "with scope", data[1], "to parent");
+  if (type=== "parent") return console.info(me, "sent", data[0], "with scope", data[1], "to parent");
 }
 
 })();
