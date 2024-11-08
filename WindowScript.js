@@ -96,13 +96,16 @@ function hookWindows(w) {
 hookWindows(window);
 
 function hook(data, type, iframe) {
-  if (type === "self") return console.info(me, "sent", data[0], "with scope", data[1], "to self");
+  let scope = data[1];
+  // If omitted, then defaults to the origin that is calling the method.
+  if (!scope) scope = window.origin;
+  if (type === "self") return console.info(me, "sent", data[0], "with scope", scope, "to self");
   if (type === "opener" && data[1] === "*") return console.warn(me, "sent", data[0], "with scope", data[1], "to opener");
-  if (type === "opener") return console.info(me, "sent", data[0], "with scope", data[1], "to opener");
+  if (type === "opener") return console.info(me, "sent", data[0], "with scope", scope, "to opener");
   if (type === "iframe" && data[1] === "*") return console.warn(me, "sent", data[0], "with scope", data[1], "to iframe", iframe);
-  if (type === "iframe") return console.info(me, "sent", data[0], "with scope", data[1], "to iframe", iframe);
+  if (type === "iframe") return console.info(me, "sent", data[0], "with scope", scope, "to iframe", iframe);
   if (type === "parent" && data[1] === "*") return console.warn(me, "sent", data[0], "with scope", data[1], "to parent");
-  if (type=== "parent") return console.info(me, "sent", data[0], "with scope", data[1], "to parent");
+  if (type=== "parent") return console.info(me, "sent", data[0], "with scope", scope, "to parent");
 }
 
 })();
