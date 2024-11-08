@@ -7,7 +7,7 @@ const iframes = new Set();
  
 function hookIframe(iframe) {
   if (iframes.has(iframe)) return;
-  iframe.__proto__ = new Proxy(result, handle('iframe'));
+  iframe.__proto__ = new Proxy(iframe.__proto__, handle('iframe'));
   iframes.add(iframe);
 }
 
