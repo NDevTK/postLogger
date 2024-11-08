@@ -7,13 +7,17 @@ const iframes = new Set();
 
 function whois(win, origin) {
  if (win === window.top) return 'top (' + origin + ')';
- if (win === window.parent) return 'parent (' + origin + ')';
+ if (win === window.parent && win !== window) return 'parent (' + origin + ')';
  if (win === window.opener) return 'opener (' + origin + ')';
- if (win.opener?.top === window.opener && window.parent === window.opener) return 'opener iframe (' + origin + ')';
+ 
+ if (win.opener === window && win === win.top) return 'popup (' + origin + ')';
+ if (win.opener === window && win !== win.top) return 'popup iframe (' + origin + ')';
+ 
  if (win.opener?.opener === window) return 'opener of opener (' + origin + ')';
  if (win.opener?.parent === window && win.opener?.parent !== win.opener) return 'parent of opener (' + origin + ')';
- if (win.top === window.top && window.parent !== window.top) return 'nested iframe (' + origin + ')';
- if (win.top === window.top && window.parent === window.top) return 'iframe (' + origin + ')';
+ 
+ if (win.top === window.top && win.parent !== window.top) return 'nested iframe (' + origin + ')';
+ if (win.top === window.top && win.parent === window.top) return 'iframe (' + origin + ')';
  return 'other (' + origin + ')';
 }
 
