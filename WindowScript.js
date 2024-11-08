@@ -74,7 +74,4 @@
     window.parent = new Proxy(real, handle('parent'));
     window.opener = new Proxy(real, handle('opener'));
     window.postMessage = new Proxy(real, handle('self'));
-
-    hookWindows(window);
-
 })();
