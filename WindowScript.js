@@ -16,7 +16,7 @@ const me = whois(window, window.origin);
 
 window.addEventListener("message", e => {
  console.info(me, "received", e.data, "from", whois(e.source, e.origin));
-};
+});
 
 function hookIframe(iframe) {
   if (iframes.has(iframe)) return;
