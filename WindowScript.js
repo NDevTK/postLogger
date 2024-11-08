@@ -20,7 +20,7 @@ function handle(type) {
     get: function(target, property) {
      const result = Reflect.get(...arguments);
      // If we are in iframe land proxy all the objects!
-     if (type === 'iframe' && typeof result === 'object' && result.top? === window.top && !iframes.has(result)) {
+     if (type === 'iframe' && typeof result === 'object' && result.top === window.top && !iframes.has(result)) {
       iframes.add(result);
       return new Proxy(result, handle(type));
      }
