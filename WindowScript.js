@@ -18,7 +18,7 @@ setInterval(() => {
 function handle(type) {
   return {
     get: function(target, property) {
-     const result = target[property];
+     const result = Reflect.get(...arguments);
      if (property === 'isProxy') return true;
      if (typeof property == 'undefined') return;
      if (!property.isProxy && typeof property === 'object') target[key] = new Proxy(result, handle(type));
