@@ -19,9 +19,11 @@ function handle(type) {
   return {
     get: function(target, property) {
      const result = Reflect.get(...arguments);
-     if (property === 'isProxy') return true;
-     if (typeof result == 'undefined') return;
-     if (!result.isProxy && typeof result === 'object') target[key] = new Proxy(result, handle(type));
+     // If we are in iframe land proxy all the objects!
+     if (type === 'iframe' && typeof result === 'object' && result.top? === window.top && !iframes.has(result)) {
+      iframes.add(result);
+      return new Proxy(result, handle(type));
+     }
      if (property !== 'postMessage') return result;
       return function() {
         hook(arguments, type);
