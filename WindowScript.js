@@ -9,7 +9,7 @@ function whois(win, origin) {
  if (win === window.top) return 'top (' + origin + ')';
  if (win === window.parent) return 'parent (' + origin + ')';
  if (win === window.opener) return 'opener (' + origin + ')';
- return 'other (' + origin + ')';
+ return 'iframe (' + origin + ')';
 }
 
 const me = whois(window, window.origin);
