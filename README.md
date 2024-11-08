@@ -4,4 +4,4 @@ Extension to log postMessage()
 - detects the scope of sent messages.
 
 # Warning
-Security of extension has not been checked.
+May cause unexpected behavour, if you find a security issues contact me.
