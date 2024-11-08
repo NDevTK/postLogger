@@ -7,14 +7,7 @@ const iframes = new Set();
  
 function hookIframe(iframe) {
   if (iframes.has(iframe)) return;
-  const iframeProxy = {
-    get(target, prop, receiver) {
-      let result = Reflect.get(...arguments);
-      if (prop !== 'contentWindow') return result;
-      return new Proxy(result, handle('iframe'));
-    },
-  };
-  iframe.__proto__ = new Proxy(iframe.__proto__, iframeProxy);
+  iframe.__proto__ = new Proxy(result, handle('iframe'));
   iframes.add(iframe);
 }
 
@@ -25,10 +18,14 @@ setInterval(() => {
 function handle(type) {
   return {
     get: function(target, property) {
-      if (property !== "postMessage") return target[property];
+     const result = target[property];
+     if (property === 'isProxy') return true;
+     if (typeof property == 'undefined') return;
+     if (!property.isProxy && typeof property === 'object') target[key] = new Proxy(result, handle(type));
+     if (property !== 'postMessage') return result;
       return function() {
         hook(arguments, type);
-        return target[property].apply(target, arguments);
+        return result.apply(target, arguments);
       }
     },
   };
