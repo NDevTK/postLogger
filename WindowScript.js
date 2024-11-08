@@ -36,8 +36,10 @@ function hookIframe(iframe) {
       return new Proxy(result, handle('iframe', iframe));
     },
   };
+  try {
   iframe.__proto__ = new Proxy(iframe.__proto__, iframeProxy);
   iframes.add(iframe);
+  } catch {}
 }
 
 setInterval(() => {
