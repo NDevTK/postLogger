@@ -6,6 +6,8 @@
     
     const realOpener = window.opener;
     const realParent = window.parent;
+    const realOpen = window.open;
+    
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 
     function displayOrigin(origin) {
@@ -75,7 +77,7 @@
     }, 100);
 
     function openHook(url) {
-        const win = window.open(url);
+        const win = realOpen(url);
         if (!win) return win;
         return new Proxy(win, handle('popup'));
     }
