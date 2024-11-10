@@ -12,8 +12,8 @@
         if (win === realParent && win !== window) return 'parent (' + origin + ')';
         if (win === realOpener) return 'opener (' + origin + ')';
 
-        if (realOpener === window && win === win.top) return 'popup (' + origin + ')';
-        if (realOpener === window && win !== win.top) return 'popup iframe (' + origin + ')';
+        if (win.opener === window && win === win.top) return 'popup (' + origin + ')';
+        if (win.opener === window && win !== win.top) return 'popup iframe (' + origin + ')';
 
         if (realOpener?.opener === window) return 'opener of opener (' + origin + ')';
         if (realOpener?.parent === window && realOpener?.parent !== realOpener) return 'parent of opener (' + origin + ')';
