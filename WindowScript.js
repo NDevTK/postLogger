@@ -6,7 +6,7 @@
     
     const realOpener = window.opener;
     const realParent = window.parent;
-    const anarchyDomains = new Set(['https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
+    const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 
     function displayOrigin(origin) {
         if (origin.startsWith('http://')) return 'UNSAFE ' + origin;
@@ -38,7 +38,7 @@
         let message = data[0];
         // If omitted, then defaults to the origin that is calling the method.
         if (!scope) scope = window.origin;
-        origin = displayOrigin(origin);
+        scope = displayOrigin(origin);
         if (type === "self") return console.info(me, "sent", message, "with scope", scope, "to self");
         if (type === "opener" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to opener");
         if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");
