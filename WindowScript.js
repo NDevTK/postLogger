@@ -95,5 +95,5 @@
     }
     
     window.postMessage = new Proxy(window.postMessage, handle('self'));
-    window.open = new Proxy(window.postMessage, handle('popup'));
+    window.open = new Proxy(window.open, handle('popup'));
 })();
