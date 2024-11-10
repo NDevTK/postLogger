@@ -40,7 +40,7 @@
         let message = data[0];
         // If omitted, then defaults to the origin that is calling the method.
         if (!scope) scope = window.origin;
-        scope = displayOrigin(origin);
+        scope = displayOrigin(scope);
         if (type === "self") return console.info(me, "sent", message, "with scope", scope, "to self");
         if (type === "opener" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to opener");
         if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");        
