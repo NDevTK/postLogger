@@ -41,7 +41,9 @@
         scope = displayOrigin(origin);
         if (type === "self") return console.info(me, "sent", message, "with scope", scope, "to self");
         if (type === "opener" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to opener");
-        if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");
+        if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");        
+        if (type === "popup" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to popup");
+        if (type === "popup") return console.info(me, "sent", message, "with scope", scope, "to popup");      
         if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to iframe", iframe);
         if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", iframe);
         if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to parent");
@@ -93,4 +95,5 @@
     }
     
     window.postMessage = new Proxy(window.postMessage, handle('self'));
+    window.open = new Proxy(window.postMessage, handle('popup'));
 })();
