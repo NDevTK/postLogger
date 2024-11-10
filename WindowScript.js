@@ -58,9 +58,6 @@
         console.info(me, "received", e.data, "from", whois(e.source, e.origin));
     });
 
-  const event = window.HTMLMediaElement.prototype.play;
-  let div = null;
-
     function hookIframe(iframe) {
         // Keep track of iframe usage to avoid repetitive proxy creation.
         if (iframes.has(iframe)) return;
@@ -76,7 +73,9 @@
             iframes.add(iframe);
         } catch {}
     }
-    
+
+    const event = window.HTMLMediaElement.prototype.play;
+
     EventTarget.prototype.addEventListener = function() {
         if (this instanceof HTMLIFrameElement) {
             hookIframe(this);
