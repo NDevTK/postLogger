@@ -74,13 +74,13 @@
         } catch {}
     }
 
-    const event = window.HTMLMediaElement.prototype.play;
+    const addEvent = EventTarget.prototype.addEventListener;
 
     EventTarget.prototype.addEventListener = function() {
         if (this instanceof HTMLIFrameElement) {
             hookIframe(this);
         }
-        return event.apply(this, arguments);
+        return addEvent.apply(this, arguments);
     }
     
     setInterval(() => {
