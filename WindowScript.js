@@ -74,6 +74,12 @@
         document.querySelectorAll('iframe').forEach(hookIframe);
     }, 100);
 
+    function openHook(url) {
+        const win = window.open(url);
+        if (!win) return win;
+        return new Proxy(win, handle('popup'));
+    }
+    
     function handle(type, iframe) {
         return {
             get: function(target, property) {
@@ -95,5 +101,5 @@
     }
     
     window.postMessage = new Proxy(window.postMessage, handle('self'));
-    window.open = new Proxy(window.open, handle('popup'));
+    window.open = openHook;
 })();
