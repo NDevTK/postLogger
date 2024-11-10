@@ -11,6 +11,7 @@
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 
     function displayOrigin(origin) {
+        if (origin === 'null') return 'OPAQUE ' + origin;
         if (origin === '*') return 'UNSAFE ' + origin;
         if (origin.startsWith('http://')) return 'UNSAFE ' + origin;
         if (anarchyDomains.has(origin)) return 'UNSAFE ' + origin;
