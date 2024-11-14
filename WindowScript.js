@@ -30,6 +30,7 @@
     
     function useProxy(object, handler, save = true) {
         if (!object) return object;
+        
         if (proxies.has(object)) {
             return proxies.get(object);
         }
@@ -49,7 +50,7 @@
     
     function whois(win, origin) {
         const source = useProxy(win);
-        const me = useProxy(window, handle('me'), false);
+        const me = window;
         const target = displayOrigin(origin);
         if (source === me.top) return 'top (' + target + ')';
         if (source === me.parent && source !== me) return 'parent (' + target + ')';
@@ -147,6 +148,9 @@
                     object = Reflect.get(...arguments);
                 } catch {
                     object = target[property];
+                }
+                if (property === "top") {
+                    return object;
                 }
                 return useProxy(object);
             },
