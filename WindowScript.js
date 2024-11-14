@@ -135,7 +135,9 @@
     function handle(type, iframe) {
         return {
             get: function(target, property) {
+                try {
                 if (property !== "postMessage") return useProxy(Reflect.get(...arguments));
+                } catch {}
                 return function() {
                     hook(arguments, type, iframe);
                     return target[property]([...arguments]);
