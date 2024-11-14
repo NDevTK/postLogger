@@ -136,7 +136,7 @@
                 if (property === "postMessage") {
                     return function() {
                         hook(arguments, type, iframe);
-                        return object.apply(target, arguments);
+                        return target[property].apply(target, arguments);
                     }
                 }
                 let object = {};
