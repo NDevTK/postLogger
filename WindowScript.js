@@ -84,8 +84,8 @@
     }
 
     window.addEventListener("message", e => {
-        uncheckedMessage.add(e);
         console.info(me, "received", e.data, "from", whois(e.source, e.origin));
+        uncheckedMessage.add(e);
         setTimeout(() => {
             if (!uncheckedMessage.has(e)) return;
             console.warn(me, "did not verify", e.data, "from", whois(e.source, e.origin));
