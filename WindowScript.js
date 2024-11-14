@@ -30,11 +30,11 @@
     function useProxy(object, handler) {
         if (!object) return object;
         // We cant proxy the current window.
-        if (object === window) return window;
+        if (object === window) return object;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
-        if (!handler) return;
+        if (!handler) return object;
         const p = new Proxy(object, handler);
         proxies.set(object, p);
         return p;
@@ -135,10 +135,7 @@
     function handle(type, iframe) {
         return {
             get: function(target, property) {
-                // property might not exist.
-                try {
                 if (property !== "postMessage") return useProxy(Reflect.get(...arguments));
-                } catch {}
                 return function() {
                     hook(arguments, type, iframe);
                     return target[property]([...arguments]);
