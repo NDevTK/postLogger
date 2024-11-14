@@ -3,6 +3,7 @@
     'use strict';
 
     const proxies = new WeakMap();
+    const uncheckedMessage = new Set();
     const realOpen = window.open;
     
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
@@ -21,7 +22,7 @@
     const getOrigin = originDescriptor.get;
     originDescriptor.get = function() {
         const origin = getOrigin.apply(this);
-        console.info(me, 'checked origin of message from', displayOrigin(origin));
+        uncheckedMessage.delete(this);
         return origin;
     };
     Object.defineProperty(window.MessageEvent.prototype, 'origin', originDescriptor);
@@ -83,7 +84,13 @@
     }
 
     window.addEventListener("message", e => {
+        uncheckedMessage.add(e);
         console.info(me, "received", e.data, "from", whois(e.source, e.origin));
+        setTimeout(() => {
+            if (!uncheckedMessage.has(e)) return;
+            console.warn(me, "did not verify", e.data, "from", whois(e.source, e.origin));
+            uncheckedMessage.delete(e);
+        }, 2000);
     });
 
     function hookIframe(iframe) {
