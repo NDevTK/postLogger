@@ -12,7 +12,7 @@
         "<all_urls>"
       ],
       "js": [
-        "WindowScript.js"
+        "SNOW.js", "WindowScript.js"
       ],
       "world": "MAIN"
     }
