@@ -119,7 +119,10 @@
     function handle(type, iframe) {
         return {
             get: function(target, property) {
+                // property might not exist.
+                try {
                 if (property !== "postMessage") return Reflect.get(...arguments);
+                } catch {}
                 return function() {
                     hook(arguments, type, iframe);
                     return target[property].apply(target, arguments);
