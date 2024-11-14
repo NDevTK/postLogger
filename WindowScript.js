@@ -34,6 +34,7 @@
         if (proxies.has(object)) {
             return proxies.get(object);
         }
+        if (!handler) return;
         const p = new Proxy(object, handler);
         proxies.set(object, p);
         return p;
@@ -130,7 +131,7 @@
             get: function(target, property) {
                 // property might not exist.
                 try {
-                if (property !== "postMessage") return Reflect.get(...arguments);
+                if (property !== "postMessage") return useProxy(Reflect.get(...arguments));
                 } catch {}
                 return function() {
                     hook(arguments, type, iframe);
