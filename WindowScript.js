@@ -6,6 +6,7 @@
     const iframes = new WeakSet();
     const uncheckedMessage = new Set();
     const realOpen = window.open;
+    const realParent = window.parent;
     
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 
@@ -62,8 +63,8 @@
         if (me.opener?.opener === me) return 'opener of opener (' + target + ')';
         if (me.opener?.parent === me && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
 
-        if (source.top === me.top && me.parent !== me.top) return 'nested iframe (' + target + ')';
-        if (source.top === me.top && me.parent === me.top) return 'iframe (' + target + ')';
+        if (source.top === me.top && realParent !== me.top) return 'nested iframe (' + target + ')';
+        if (source.top === me.top && realParent === me.top) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
 
