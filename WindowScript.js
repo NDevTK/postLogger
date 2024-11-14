@@ -107,7 +107,7 @@
             },
         };
         try {
-            iframe.__proto__ = new Proxy(iframe.__proto__, iframeProxy);
+            iframe.__proto__ = useProxy(iframe.__proto__, iframeProxy);
         } catch {}
     }
 
