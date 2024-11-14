@@ -138,7 +138,7 @@
                 } catch {}
                 return function() {
                     hook(arguments, type, iframe);
-                    return target[property]([...arguments]);
+                    return target[property].apply(target, arguments);
                 }
             },
         };
