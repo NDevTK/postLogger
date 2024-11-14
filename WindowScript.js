@@ -48,8 +48,8 @@
         return origin;
     }
     
-    function whois(win, origin) {
-        const source = useProxy(win);
+    function whois(source, origin) {
+        const windowTop = useProxy(window.top);
         const target = displayOrigin(origin);
         if (source === window.top) return 'top (' + target + ')';
         if (source === window.parent && win !== window) return 'parent (' + target + ')';
@@ -61,8 +61,8 @@
         if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
         if (window.opener?.parent === window && window.opener?.parent !== window.opener) return 'parent of opener (' + target + ')';
 
-        if (source.top === window.top && window.parent !== window.top) return 'nested iframe (' + target + ')';
-        if (source.top === window.top && window.parent === window.top) return 'iframe (' + target + ')';
+        if (source.top === window.top && window.parent !== windowTop) return 'nested iframe (' + target + ')';
+        if (source.top === window.top && window.parent === windowTop) return 'iframe (' + target + ')';
         return 'other (' + origin + ')';
     }
 
