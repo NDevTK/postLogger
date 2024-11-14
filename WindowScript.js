@@ -29,8 +29,6 @@
     
     function useProxy(object, handler) {
         if (!object) return object;
-        // We cant proxy the current window.
-        if (object === window) return object;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
@@ -146,8 +144,14 @@
         };
     }
     
-    window.parent = useProxy(window.parent, handle('parent'));
+    if (window !== window.parent) {
+        window.parent = useProxy(window.parent, handle('parent'));
+    }
+    
     window.opener = useProxy(window.opener, handle('opener'));
     window.postMessage = useProxy(window.postMessage, handle('self'));
+    // We cant proxy the current window or window.top but creating the proxies anyway.
+    useProxy(window, handle('self'));
+    useProxy(window.top, handle('self'));
     window.open = openHook;
 })();
