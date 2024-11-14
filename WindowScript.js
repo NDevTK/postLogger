@@ -27,14 +27,14 @@
     };
     Object.defineProperty(window.MessageEvent.prototype, 'origin', originDescriptor);
     
-    function useProxy(object, handler) {
+    function useProxy(object, handler, save = true) {
         if (!object) return object;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
         if (!handler) return object;
         const p = new Proxy(object, handler);
-        proxies.set(object, p);
+        if (save) proxies.set(object, p);
         return p;
     }
     
@@ -48,7 +48,7 @@
     
     function whois(win, origin) {
         const source = useProxy(win);
-        const me = useProxy(window);
+        const me = useProxy(window, handle('me'), false);
         const target = displayOrigin(origin);
         if (source === me.top) return 'top (' + target + ')';
         if (source === me.parent && source !== me) return 'parent (' + target + ')';
@@ -156,8 +156,5 @@
     
     window.opener = useProxy(window.opener, handle('opener'));
     window.postMessage = useProxy(window.postMessage, handle('self'));
-    // We cant proxy the current window or window.top but creating the proxies anyway.
-    useProxy(window, handle('self'));
-    useProxy(window.top, handle('self'));
     window.open = openHook;
 })();
