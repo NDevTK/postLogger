@@ -100,7 +100,7 @@
     });
 
   function hookIframe(iframe) {
-      if (iframes.has(iframe) return;
+      if (iframes.has(iframe)) return;
       iframes.add(iframe);
       const iframeProxy = {
           get(target, prop, receiver) {
