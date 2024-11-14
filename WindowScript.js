@@ -133,17 +133,19 @@
     function handle(type, iframe) {
         return {
             get: function(target, property) {
+                if (property === "postMessage") {
+                    return function() {
+                        hook(arguments, type, iframe);
+                        return object.apply(target, arguments);
+                    }
+                }
                 let object = {};
                 try {
                     object = Reflect.get(...arguments);
                 } catch {
                     object = target[property];
                 }
-                if (property !== "postMessage") return useProxy(object);
-                return function() {
-                    hook(arguments, type, iframe);
-                    return object.apply(target, arguments);
-                }
+                return useProxy(object);
             },
         };
     }
