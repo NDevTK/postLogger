@@ -67,9 +67,9 @@
         return 'other (' + target + ')';
     }
 
-    const me = whois(window, window.origin);
-
+    
     function hook(data, type, iframe) {
+        const me = whois(window, window.origin);
         let scope = data[1];
         let message = data[0];
         // If omitted, then defaults to the origin that is calling the method.
@@ -90,6 +90,7 @@
     }
 
     window.addEventListener("message", e => {
+        const me = whois(window, window.origin);
         console.info(me, "received", e.data, "from", whois(e.source, e.origin));
         uncheckedMessage.add(e);
         setTimeout(() => {
