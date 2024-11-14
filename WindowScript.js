@@ -6,7 +6,8 @@
     const realOpen = window.open;
     
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
-    
+
+    // Adds proxy to MessageEvent.source
     const desc = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'source');
     const get = desc.get;
     desc.get = function() {
@@ -15,7 +16,7 @@
     };
     Object.defineProperty(window.MessageEvent.prototype, 'source', desc);
 
-
+    // Detects when MessageEvent.origin is used. 
     const desc2 = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'origin');
     const getOrigin = desc2.get;
     desc2.get = function() {
@@ -32,6 +33,7 @@
         }
         const p = new Proxy(object, handler);
         proxies.set(object, p);
+        return p;
     }
     
     function displayOrigin(origin) {
@@ -95,8 +97,8 @@
         } catch {}
     }
 
+    // Adds proxy when addEventListener is used on iframe.
     const addEvent = EventTarget.prototype.addEventListener;
-
     EventTarget.prototype.addEventListener = function() {
         if (this instanceof HTMLIFrameElement) {
             hookIframe(this);
