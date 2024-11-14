@@ -2,14 +2,41 @@
 (function() {
     'use strict';
 
-    const iframes = new WeakSet();
+    const proxies = new WeakMap();
     
     const realOpener = window.opener;
     const realParent = window.parent;
     const realOpen = window.open;
     
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
+    
+    const desc = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'source');
+    const get = desc.get;
+    desc.get = function() {
+        const source = get.call(this);
+        return useProxy(source, handle('source'));
+    };
+    Object.defineProperty(window.MessageEvent.prototype, 'source', desc);
 
+
+    const desc2 = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'origin');
+    const getOrigin = desc2.get;
+    desc2.get = function() {
+        const origin = getOrigin();
+        console.info(me, 'checked origin of message from', displayOrigin(origin));
+        return origin;
+    };
+    Object.defineProperty(window.MessageEvent.prototype, 'origin', desc2);
+    
+    function useProxy(object, handler) {
+        if (!object) return object;
+        if (proxies.has(object)) {
+            return proxies.get(object);
+        }
+        const p = new Proxy(object, handler);
+        proxies.set(object, p);
+    }
+    
     function displayOrigin(origin) {
         if (origin === 'null') return 'OPAQUE ' + origin;
         if (origin === '*') return 'UNSAFE ' + origin;
@@ -59,18 +86,15 @@
     });
 
     function hookIframe(iframe) {
-        // Keep track of iframe usage to avoid repetitive proxy creation.
-        if (iframes.has(iframe)) return;
         const iframeProxy = {
             get(target, prop, receiver) {
                 let result = Reflect.get(...arguments);
                 if (prop !== 'contentWindow') return result;
-                return new Proxy(result, handle('iframe', iframe));
+                return useProxy(result, handle('iframe', iframe));
             },
         };
         try {
             iframe.__proto__ = new Proxy(iframe.__proto__, iframeProxy);
-            iframes.add(iframe);
         } catch {}
     }
 
@@ -90,7 +114,7 @@
     function openHook(url) {
         const win = realOpen(url);
         if (!win) return win;
-        return new Proxy(win, handle('popup'));
+        return useProxy(win, handle('popup'));
     }
     
     function handle(type, iframe) {
@@ -106,13 +130,13 @@
     }
     
     if (window.parent !== window) {
-        window.parent = new Proxy(window.parent, handle('parent'));
+        window.parent = useProxy(window.parent, handle('parent'));
     }
     
     if (window.opener) {
-        window.opener = new Proxy(window.opener, handle('opener'));
+        window.opener = useProxy(window.opener, handle('opener'));
     }
     
-    window.postMessage = new Proxy(window.postMessage, handle('self'));
+    window.postMessage = useProxy(window.postMessage, handle('self'));
     window.open = openHook;
 })();
