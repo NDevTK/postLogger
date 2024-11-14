@@ -132,13 +132,11 @@
     function handle(type, iframe) {
         return {
             get: function(target, property) {
-                if (property === "postMessage") {
-                    return function() {
-                        hook(arguments, type, iframe);
-                        return target[property].apply(target, arguments);
-                    }
+                if (property !== "postMessage") return Reflect.get(...arguments);
+                return function() {
+                    hook(arguments, type, iframe);
+                    return target[property].apply(target, arguments);
                 }
-                return Reflect.get(...arguments);
             },
         };
     }
