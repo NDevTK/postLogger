@@ -146,9 +146,7 @@
                 try {
                     object = Reflect.get(...arguments);
                 } catch {
-                    if (property === "") {
-                        object = target;
-                    }
+                    object = target[property];
                 }
                 return useProxy(object);
             },
