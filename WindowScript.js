@@ -8,23 +8,23 @@
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 
     // Adds proxy to MessageEvent.source
-    const desc = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'source');
-    const get = desc.get;
-    desc.get = function() {
+    const sourceDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'source');
+    const get = sourceDescriptor.get;
+    sourceDescriptor.get = function() {
         const source = get.call(this);
         return useProxy(source, handle('source'));
     };
-    Object.defineProperty(window.MessageEvent.prototype, 'source', desc);
+    Object.defineProperty(window.MessageEvent.prototype, 'source', sourceDescriptor);
 
-    // Detects when MessageEvent.origin is used. 
-    const desc2 = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'origin');
-    const getOrigin = desc2.get;
-    desc2.get = function() {
-        const origin = getOrigin();
+    // Detects when MessageEvent.origin is used.
+    const originDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'origin');
+    const getOrigin = originDescriptor.get;
+    originDescriptor.get = function() {
+        const origin = getOrigin.apply(this);
         console.info(me, 'checked origin of message from', displayOrigin(origin));
         return origin;
     };
-    Object.defineProperty(window.MessageEvent.prototype, 'origin', desc2);
+    Object.defineProperty(window.MessageEvent.prototype, 'origin', originDescriptor);
     
     function useProxy(object, handler) {
         if (!object) return object;
