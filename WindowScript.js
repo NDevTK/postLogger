@@ -145,7 +145,7 @@
                 } catch {
                     object = target[property];
                 }
-                if (type === 'self' && property === 'top') {
+                if (type === 'self') {
                     return object;
                 }
                 return useProxy(object);
