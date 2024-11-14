@@ -14,8 +14,7 @@
     const get = sourceDescriptor.get;
     sourceDescriptor.get = function() {
         const source = get.call(this);
-        // If window is proxied then return the proxy.
-        return useProxy(source);
+        return useProxy(source, handle('source'));
     };
     Object.defineProperty(window.MessageEvent.prototype, 'source', sourceDescriptor);
 
@@ -29,15 +28,14 @@
     };
     Object.defineProperty(window.MessageEvent.prototype, 'origin', originDescriptor);
     
-    function useProxy(object, handler) {
+    function useProxy(object, handler, save = true) {
         if (!object) return object;
-        if (object === window) return object;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
         if (!handler) return object;
         const p = new Proxy(object, handler);
-        proxies.set(object, p);
+        if (save) proxies.set(object, p);
         return p;
     }
     
@@ -49,22 +47,25 @@
         return origin;
     }
     
-    function whois(source, origin) {
+    function whois(win, origin) {
+        const source = useProxy(win);
+        const me = useProxy(window, handle('me'), false);
         const target = displayOrigin(origin);
-        if (source === window.top) return 'top (' + target + ')';
-        if (source === window.parent && source !== window) return 'parent (' + target + ')';
-        if (source === window.opener) return 'opener (' + target + ')';
+        if (source === me.top) return 'top (' + target + ')';
+        if (source === me.parent && source !== me) return 'parent (' + target + ')';
+        if (source === me.opener) return 'opener (' + target + ')';
 
-        if (source.opener === window && source === source.top) return 'popup (' + target + ')';
-        if (source.opener === window && source !== source.top) return 'popup iframe (' + target + ')';
+        if (source.opener === me && source === source.top) return 'popup (' + target + ')';
+        if (source.opener === me && source !== source.top) return 'popup iframe (' + target + ')';
 
-        if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
-        if (window.opener?.parent === window && window.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
+        if (me.opener?.opener === me) return 'opener of opener (' + target + ')';
+        if (me.opener?.parent === me && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
 
-        if (source.top === window.top && window.parent !== window.top) return 'nested iframe (' + target + ')';
-        if (source.top === window.top && window.parent === window.top) return 'iframe (' + target + ')';
+        if (source.top === me.top && me.parent !== me.top) return 'nested iframe (' + target + ')';
+        if (source.top === me.top && me.parent === me.top) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
+
     
     function hook(data, type, iframe) {
         const me = whois(window, window.origin);
@@ -99,19 +100,19 @@
     });
 
   function hookIframe(iframe) {
-        if (iframes.has(iframe)) return;
-        iframes.add(iframe);
-        const iframeProxy = {
-            get(target, prop, receiver) {
-                let result = Reflect.get(...arguments);
-                if (prop !== 'contentWindow') return result;
-                return useProxy(result, handle('iframe', iframe));
-            },
-        };
-        try {
-            iframe.__proto__ = useProxy(iframe.__proto__, iframeProxy);
-        } catch {}
-    }
+      if (iframes.has(iframe) return;
+      iframes.add(iframe);
+      const iframeProxy = {
+          get(target, prop, receiver) {
+              let result = Reflect.get(...arguments);
+              if (prop !== 'contentWindow') return result;
+              return useProxy(result, handle('iframe', iframe));
+          },
+      };
+      try {
+          iframe.__proto__ = useProxy(iframe.__proto__, iframeProxy);
+      } catch {}
+  }
 
     // Adds proxy when addEventListener is used on iframe.
     const addEvent = EventTarget.prototype.addEventListener;
@@ -135,16 +136,29 @@
     function handle(type, iframe) {
         return {
             get: function(target, property) {
-                if (property !== "postMessage") return Reflect.get(...arguments);
-                return function() {
-                    hook(arguments, type, iframe);
-                    return target[property].apply(target, arguments);
+                if (property === "postMessage") {
+                    return function() {
+                        hook(arguments, type, iframe);
+                        return target[property].apply(target, arguments);
+                    }
                 }
+                let object = {};
+                try {
+                    object = Reflect.get(...arguments);
+                } catch {
+                    if (property === "") {
+                        object = target;
+                    }
+                }
+                return useProxy(object);
             },
         };
     }
     
-    window.parent = useProxy(window.parent, handle('parent'));    
+    if (window !== window.parent) {
+        window.parent = useProxy(window.parent, handle('parent'));
+    }
+    
     window.opener = useProxy(window.opener, handle('opener'));
     window.postMessage = useProxy(window.postMessage, handle('self'));
     window.open = openHook;
