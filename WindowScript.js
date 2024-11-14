@@ -30,6 +30,7 @@
     
     function useProxy(object, handler) {
         if (!object) return object;
+        if (object === window) return object;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
@@ -142,10 +143,7 @@
         };
     }
     
-    if (window !== window.parent) {
-        window.parent = useProxy(window.parent, handle('parent'));
-    }
-    
+    window.parent = useProxy(window.parent, handle('parent'));    
     window.opener = useProxy(window.opener, handle('opener'));
     window.postMessage = useProxy(window.postMessage, handle('self'));
     window.open = openHook;
