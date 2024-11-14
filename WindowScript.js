@@ -145,7 +145,7 @@
                 } catch {
                     object = target[property];
                 }
-                if (type === 'iframe' && property === 'top') {
+                if (type === 'self' && property === 'top') {
                     return object;
                 }
                 return useProxy(object);
