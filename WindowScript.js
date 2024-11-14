@@ -29,15 +29,15 @@
     };
     Object.defineProperty(window.MessageEvent.prototype, 'origin', originDescriptor);
     
-    function useProxy(object, handler, save = true) {
+    function useProxy(object, handler) {
         if (!object) return object;
-        
+        if (object === window) return object;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
         if (!handler) return object;
         const p = new Proxy(object, handler);
-        if (save) proxies.set(object, p);
+        proxies.set(object, p);
         return p;
     }
     
