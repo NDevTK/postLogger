@@ -80,8 +80,11 @@
         if (type === "popup") return console.info(me, "sent", message, "with scope", scope, "to popup");      
         if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to iframe", iframe);
         if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", iframe);
+        if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to message source", iframe);
+        if (type === "source") return console.info(me, "sent", message, "with scope", scope, "to message source", iframe);
         if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to parent");
         if (type === "parent") return console.info(me, "sent", message, "with scope", scope, "to parent");
+        return console.info(me, "sent", message, "with scope", scope, "to other");
     }
 
     window.addEventListener("message", e => {
@@ -141,14 +144,9 @@
         };
     }
     
-    if (window.parent !== window) {
-        window.parent = useProxy(window.parent, handle('parent'));
-    }
-    
-    if (window.opener) {
-        window.opener = useProxy(window.opener, handle('opener'));
-    }
-    
+    window.parent = useProxy(window.parent, handle('parent'));
+    window.opener = useProxy(window.opener, handle('opener'));
+    window.top = useProxy(window.opener, handle('top'));
     window.postMessage = useProxy(window.postMessage, handle('self'));
     window.open = openHook;
 })();
