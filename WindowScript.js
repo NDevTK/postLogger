@@ -49,19 +49,20 @@
     }
     
     function whois(win, origin) {
-        origin = displayOrigin(origin);
-        if (win === window.top) return 'top (' + origin + ')';
-        if (win === window.parent && win !== window) return 'parent (' + origin + ')';
-        if (win === window.opener) return 'opener (' + origin + ')';
+        const source = useProxy(win);
+        const target = displayOrigin(origin);
+        if (source === window.top) return 'top (' + target + ')';
+        if (source === window.parent && win !== window) return 'parent (' + target + ')';
+        if (source === window.opener) return 'opener (' + target + ')';
 
-        if (win.opener === window && win === win.top) return 'popup (' + origin + ')';
-        if (win.opener === window && win !== win.top) return 'popup iframe (' + origin + ')';
+        if (source.opener === window && source === source.top) return 'popup (' + target + ')';
+        if (source.opener === window && source !== source.top) return 'popup iframe (' + target + ')';
 
-        if (window.opener?.opener === window) return 'opener of opener (' + origin + ')';
-        if (window.opener?.parent === window && window.opener?.parent !== window.opener) return 'parent of opener (' + origin + ')';
+        if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
+        if (window.opener?.parent === window && window.opener?.parent !== window.opener) return 'parent of opener (' + target + ')';
 
-        if (win.top === window.top && window.parent !== window.top) return 'nested iframe (' + origin + ')';
-        if (win.top === window.top && window.parent === window.top) return 'iframe (' + origin + ')';
+        if (source.top === window.top && window.parent !== window.top) return 'nested iframe (' + target + ')';
+        if (source.top === window.top && window.parent === window.top) return 'iframe (' + target + ')';
         return 'other (' + origin + ')';
     }
 
