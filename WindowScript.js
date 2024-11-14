@@ -15,7 +15,7 @@
     const get = sourceDescriptor.get;
     sourceDescriptor.get = function() {
         const source = get.call(this);
-        return useProxy(source, handle('source'));
+        return useProxy(source);
     };
     Object.defineProperty(window.MessageEvent.prototype, 'source', sourceDescriptor);
 
