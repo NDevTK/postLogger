@@ -28,6 +28,8 @@
     
     function useProxy(object, handler) {
         if (!object) return object;
+        // We cant proxy the current window.
+        if (object === window) return window;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
