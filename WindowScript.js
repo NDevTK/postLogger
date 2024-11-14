@@ -63,7 +63,7 @@
 
         if (source.top === window.top && window.parent !== windowTop) return 'nested iframe (' + target + ')';
         if (source.top === window.top && window.parent === windowTop) return 'iframe (' + target + ')';
-        return 'other (' + origin + ')';
+        return 'other (' + target + ')';
     }
 
     const me = whois(window, window.origin);
