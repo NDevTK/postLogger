@@ -13,7 +13,8 @@
     const get = sourceDescriptor.get;
     sourceDescriptor.get = function() {
         const source = get.call(this);
-        return useProxy(source, handle('source'));
+        // If window is proxied then return the proxy.
+        return useProxy(source);
     };
     Object.defineProperty(window.MessageEvent.prototype, 'source', sourceDescriptor);
 
@@ -46,25 +47,22 @@
         return origin;
     }
     
-    function whois(win, origin) {
-        const source = useProxy(win);
-        const me = useProxy(window, handle('me'), false);
+    function whois(source, origin) {
         const target = displayOrigin(origin);
-        if (source === me.top) return 'top (' + target + ')';
-        if (source === me.parent && source !== me) return 'parent (' + target + ')';
-        if (source === me.opener) return 'opener (' + target + ')';
+        if (source === window.top) return 'top (' + target + ')';
+        if (source === window.parent && source !== window) return 'parent (' + target + ')';
+        if (source === window.opener) return 'opener (' + target + ')';
 
-        if (source.opener === me && source === source.top) return 'popup (' + target + ')';
-        if (source.opener === me && source !== source.top) return 'popup iframe (' + target + ')';
+        if (source.opener === window && source === source.top) return 'popup (' + target + ')';
+        if (source.opener === window && source !== source.top) return 'popup iframe (' + target + ')';
 
-        if (me.opener?.opener === me) return 'opener of opener (' + target + ')';
-        if (me.opener?.parent === me && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
+        if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
+        if (window.opener?.parent === window && window.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
 
-        if (source.top === me.top && me.parent !== me.top) return 'nested iframe (' + target + ')';
-        if (source.top === me.top && me.parent === me.top) return 'iframe (' + target + ')';
+        if (source.top === window.top && window.parent !== window.top) return 'nested iframe (' + target + ')';
+        if (source.top === window.top && window.parent === window.top) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
-
     
     function hook(data, type, iframe) {
         const me = whois(window, window.origin);
@@ -139,15 +137,7 @@
                         return target[property].apply(target, arguments);
                     }
                 }
-                let object = {};
-                try {
-                    object = Reflect.get(...arguments);
-                } catch {
-                    if (property === "") {
-                        object = target;
-                    }
-                }
-                return useProxy(object);
+                return Reflect.get(...arguments);
             },
         };
     }
