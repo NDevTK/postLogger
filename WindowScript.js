@@ -48,20 +48,20 @@
     
     function whois(win, origin) {
         const source = useProxy(win);
-        const windowTop = useProxy(window.top);
+        const me = useProxy(window);
         const target = displayOrigin(origin);
-        if (source === window.top) return 'top (' + target + ')';
-        if (source === window.parent && win !== window) return 'parent (' + target + ')';
-        if (source === window.opener) return 'opener (' + target + ')';
+        if (source === me.top) return 'top (' + target + ')';
+        if (source === me.parent && source !== me) return 'parent (' + target + ')';
+        if (source === me.opener) return 'opener (' + target + ')';
 
-        if (source.opener === window && source === source.top) return 'popup (' + target + ')';
-        if (source.opener === window && source !== source.top) return 'popup iframe (' + target + ')';
+        if (source.opener === me && source === source.top) return 'popup (' + target + ')';
+        if (source.opener === me && source !== source.top) return 'popup iframe (' + target + ')';
 
-        if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
-        if (window.opener?.parent === window && window.opener?.parent !== window.opener) return 'parent of opener (' + target + ')';
+        if (me.opener?.opener === me) return 'opener of opener (' + target + ')';
+        if (me.opener?.parent === me && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
 
-        if (source.top === window.top && window.parent !== windowTop) return 'nested iframe (' + target + ')';
-        if (source.top === window.top && window.parent === windowTop) return 'iframe (' + target + ')';
+        if (source.top === me.top && me.parent !== me.top) return 'nested iframe (' + target + ')';
+        if (source.top === me.top && me.parent === me.top) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
 
