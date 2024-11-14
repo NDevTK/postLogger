@@ -3,9 +3,6 @@
     'use strict';
 
     const proxies = new WeakMap();
-    
-    const realOpener = window.opener;
-    const realParent = window.parent;
     const realOpen = window.open;
     
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
@@ -48,17 +45,17 @@
     function whois(win, origin) {
         origin = displayOrigin(origin);
         if (win === window.top) return 'top (' + origin + ')';
-        if (win === realParent && win !== window) return 'parent (' + origin + ')';
-        if (win === realOpener) return 'opener (' + origin + ')';
+        if (win === window.parent && win !== window) return 'parent (' + origin + ')';
+        if (win === window.opener) return 'opener (' + origin + ')';
 
         if (win.opener === window && win === win.top) return 'popup (' + origin + ')';
         if (win.opener === window && win !== win.top) return 'popup iframe (' + origin + ')';
 
-        if (realOpener?.opener === window) return 'opener of opener (' + origin + ')';
-        if (realOpener?.parent === window && realOpener?.parent !== realOpener) return 'parent of opener (' + origin + ')';
+        if (window.opener?.opener === window) return 'opener of opener (' + origin + ')';
+        if (window.opener?.parent === window && window.opener?.parent !== window.opener) return 'parent of opener (' + origin + ')';
 
-        if (win.top === window.top && realParent !== window.top) return 'nested iframe (' + origin + ')';
-        if (win.top === window.top && realParent === window.top) return 'iframe (' + origin + ')';
+        if (win.top === window.top && window.parent !== window.top) return 'nested iframe (' + origin + ')';
+        if (win.top === window.top && window.parent === window.top) return 'iframe (' + origin + ')';
         return 'other (' + origin + ')';
     }
 
