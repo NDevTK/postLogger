@@ -145,9 +145,6 @@
                 } catch {
                     object = target[property];
                 }
-                if (type === 'self') {
-                    return object;
-                }
                 return useProxy(object);
             },
         };
@@ -159,8 +156,5 @@
     
     window.opener = useProxy(window.opener, handle('opener'));
     window.postMessage = useProxy(window.postMessage, handle('self'));
-    // We cant proxy the current window or window.top but creating the proxies anyway.
-    useProxy(window, handle('self'));
-    useProxy(window.top, handle('self'));
     window.open = openHook;
 })();
