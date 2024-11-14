@@ -145,6 +145,9 @@
                 } catch {
                     object = target[property];
                 }
+                if (type === 'iframe' && property === 'top') {
+                    return object;
+                }
                 return useProxy(object);
             },
         };
