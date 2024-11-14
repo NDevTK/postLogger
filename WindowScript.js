@@ -98,9 +98,16 @@
         }, 2000);
     });
 
-    function hookIframe(iframe) {
+  function hookIframe(iframe) {
+        const iframeProxy = {
+            get(target, prop, receiver) {
+                let result = Reflect.get(...arguments);
+                if (prop !== 'contentWindow') return result;
+                return useProxy(result, handle('iframe', iframe));
+            },
+        };
         try {
-            iframe.__proto__ = useProxy(iframe.__proto__, handle('iframe'));
+            iframe.__proto__ = useProxy(iframe.__proto__, iframeProxy);
         } catch {}
     }
 
