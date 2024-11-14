@@ -31,7 +31,6 @@
     
     function useProxy(object, handler) {
         if (!object) return object;
-        if (object === window) return object;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
@@ -60,7 +59,7 @@
         if (source.opener === window && source !== source.top) return 'popup iframe (' + target + ')';
 
         if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
-        if (window.opener?.parent === window && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
+        if (window.opener?.parent === window && window.opener?.parent !== window.opener) return 'parent of opener (' + target + ')';
         // We cant hook window.top so it always provides the non-proxied value.
         if (source.parent === source && realParent !== realTop) return 'nested iframe (' + target + ')';
         if (source.parent !== source && realParent === realTop) return 'iframe (' + target + ')';
@@ -149,10 +148,7 @@
                 } catch {
                     object = target[property];
                 }
-                if (property === "top") {
-                    return object;
-                }
-                return useProxy(object);
+                return object;
             },
         };
     }
