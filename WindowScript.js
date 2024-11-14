@@ -158,7 +158,7 @@
     }
     
     if (window !== window.parent) {
-        window.parent.postMessage = useProxy(window.parent.postMessage, handle('parent'));
+        window.parent = useProxy(window.parent, handle('parent'));
     }
     
     window.opener = useProxy(window.opener, handle('opener'));
