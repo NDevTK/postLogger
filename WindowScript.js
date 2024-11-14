@@ -51,20 +51,19 @@
     
     function whois(win, origin) {
         const source = useProxy(win);
-        const me = window;
         const target = displayOrigin(origin);
-        if (source === me.top) return 'top (' + target + ')';
-        if (source === me.parent && source !== me) return 'parent (' + target + ')';
-        if (source === me.opener) return 'opener (' + target + ')';
+        if (source === window.top) return 'top (' + target + ')';
+        if (source === window.parent && source !== window) return 'parent (' + target + ')';
+        if (source === window.opener) return 'opener (' + target + ')';
 
-        if (source.opener === me && source === source.top) return 'popup (' + target + ')';
-        if (source.opener === me && source !== source.top) return 'popup iframe (' + target + ')';
+        if (source.opener === window && source === source.top) return 'popup (' + target + ')';
+        if (source.opener === window && source !== source.top) return 'popup iframe (' + target + ')';
 
-        if (me.opener?.opener === me) return 'opener of opener (' + target + ')';
-        if (me.opener?.parent === me && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
-
-        if (source.top === me.top && realParent !== me.top) return 'nested iframe (' + target + ')';
-        if (source.top === me.top && realParent === me.top) return 'iframe (' + target + ')';
+        if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
+        if (window.opener?.parent === window && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
+        // We cant hook window.top so it always provides the non-proxied value.
+        if (source.top === window.top && realParent !== window.top) return 'nested iframe (' + target + ')';
+        if (source.top === window.top && realParent === window.top) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
 
