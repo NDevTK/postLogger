@@ -146,7 +146,7 @@
     
     window.parent = useProxy(window.parent, handle('parent'));
     window.opener = useProxy(window.opener, handle('opener'));
-    window.top = useProxy(window.opener, handle('top'));
+    window.top = useProxy(window.top, handle('top'));
     window.postMessage = useProxy(window.postMessage, handle('self'));
     window.open = openHook;
 })();
