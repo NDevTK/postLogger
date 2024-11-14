@@ -3,6 +3,7 @@
     'use strict';
 
     const proxies = new WeakMap();
+    const iframes = new WeakSet();
     const uncheckedMessage = new Set();
     const realOpen = window.open;
     
@@ -98,6 +99,8 @@
     });
 
   function hookIframe(iframe) {
+        if (iframes.has(iframe)) return;
+        iframes.add(iframe);
         const iframeProxy = {
             get(target, prop, receiver) {
                 let result = Reflect.get(...arguments);
