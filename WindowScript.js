@@ -62,8 +62,8 @@
         if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
         if (window.opener?.parent === window && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
         // We cant hook window.top so it always provides the non-proxied value.
-        if (source.top === window.top && realParent !== window.top) return 'nested iframe (' + target + ')';
-        if (source.top === window.top && realParent === window.top) return 'iframe (' + target + ')';
+        if (source.parent === source && realParent !== window.top) return 'nested iframe (' + target + ')';
+        if (source.parent !== source && realParent === window.top) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
 
