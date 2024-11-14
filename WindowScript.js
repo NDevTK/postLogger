@@ -7,7 +7,7 @@
     const uncheckedMessage = new Set();
     const realOpen = window.open;
     const realParent = window.parent;
-    
+    const realTop = window.top;
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 
     // Adds proxy to MessageEvent.source
@@ -52,7 +52,7 @@
     function whois(win, origin) {
         const source = useProxy(win);
         const target = displayOrigin(origin);
-        if (source.parent === source && source === window) return 'top (' + target + ')';
+        if (source.top === realTop) return 'top (' + target + ')';
         if (source === window.parent && source !== window) return 'parent (' + target + ')';
         if (source === window.opener) return 'opener (' + target + ')';
 
@@ -62,8 +62,8 @@
         if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
         if (window.opener?.parent === window && me.opener?.parent !== me.opener) return 'parent of opener (' + target + ')';
         // We cant hook window.top so it always provides the non-proxied value.
-        if (source.parent === source && realParent !== window.top) return 'nested iframe (' + target + ')';
-        if (source.parent !== source && realParent === window.top) return 'iframe (' + target + ')';
+        if (source.parent === source && realParent !== realTop) return 'nested iframe (' + target + ')';
+        if (source.parent !== source && realParent === realTop) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
 
