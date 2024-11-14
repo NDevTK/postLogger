@@ -52,7 +52,7 @@
     function whois(win, origin) {
         const source = useProxy(win);
         const target = displayOrigin(origin);
-        if (source.top === realTop) return 'top (' + target + ')';
+        if (source === realTop) return 'top (' + target + ')';
         if (source === window.parent && source !== window) return 'parent (' + target + ')';
         if (source === window.opener) return 'opener (' + target + ')';
 
