@@ -156,7 +156,7 @@
     function handle(type, iframe) {
         return {
             get: function(target, property) {
-                if (property === "postMessage") return hookFunction(target[property], type, true, iframe);
+                if (property === "postMessage") return hookFunction(target[property], type, false, iframe);
                 let object = {};
                 try {
                     object = Reflect.get(...arguments);
