@@ -126,7 +126,9 @@
   function hookFunction(object, type, shouldProxy, iframe) {
       const functionProxy = {
           apply: function (target, thisArg, argumentsList) {
-              if (target.name === 'postMessage') hook(arguments, type, iframe);
+              if (target.name === 'postMessage') {
+                  hook(argumentsList, type, iframe);
+              }
               const result = Reflect.apply(...arguments);
               return (shouldProxy) ? useProxy(result, handle(type)) : result;
           },
