@@ -123,6 +123,17 @@
       } catch {}
   }
 
+  function hookFunction(object, type, shouldProxy) {
+      const functionProxy = {
+          apply: function (target, thisArg, argumentsList) {
+              hook(arguments, type, iframe);
+              const result = target[property].apply(target, arguments);
+              return (shouldProxy) ? useProxy(result, handle(type)) : result;
+          },
+      };
+      return useProxy(object, functionProxy);
+  }
+
     // Adds proxy when addEventListener is used on iframe.
     const addEvent = EventTarget.prototype.addEventListener;
     EventTarget.prototype.addEventListener = function() {
@@ -165,7 +176,7 @@
     if (window !== window.parent) {
         window.parent = useProxy(window.parent, handle('parent'));
     }
-    MessagePort.prototype = useProxy(MessagePort.prototype, handle('MessagePort'));
+    MessagePort.prototype.postMessage = hookFunction(MessagePort.prototype.postMessage, 'MessageChannel');
     window.opener = useProxy(window.opener, handle('opener'));
-    window.open = openHook;
+    window.open = hookFunction(window.open, 'popup', true);
 })();
