@@ -48,8 +48,7 @@
         return origin;
     }
     
-    function whois(win, origin) {
-        const source = useProxy(win);
+    function whois(source, origin) {
         const target = displayOrigin(origin);
         if (source.window === window.top) return 'top (' + target + ')';
         if (source === window.parent && source !== window) return 'parent (' + target + ')';
