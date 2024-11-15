@@ -165,7 +165,7 @@
     if (window !== window.parent) {
         window.parent = useProxy(window.parent, handle('parent'));
     }
-    
+    MessagePort.prototype = useProxy(MessagePort.prototype, handle('MessagePort'));
     window.opener = useProxy(window.opener, handle('opener'));
     window.postMessage = useProxy(window.postMessage, handle('self'));
     window.open = openHook;
