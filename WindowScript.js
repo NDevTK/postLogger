@@ -159,7 +159,11 @@
                         return target[property].apply(target, arguments);
                     }
                 }
-                return Reflect.get(...arguments);
+                try {
+                    return Reflect.get(...arguments);
+                } catch {
+                    return target[property];
+                }
             },
         };
     }
