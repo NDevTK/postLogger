@@ -123,10 +123,10 @@
       } catch {}
   }
 
-  function hookFunction(object, type, shouldProxy) {
+  function hookFunction(object, type, shouldProxy, iframe) {
       const functionProxy = {
           apply: function (target, thisArg, argumentsList) {
-              if (target.name === 'postMessage') hook(arguments, type);
+              if (target.name === 'postMessage') hook(arguments, type, iframe);
               const result = Reflect.apply(...arguments);
               return (shouldProxy) ? useProxy(result, handle(type)) : result;
           },
@@ -156,12 +156,7 @@
     function handle(type, iframe) {
         return {
             get: function(target, property) {
-                if (property === "postMessage") {
-                    return function() {
-                        hook(arguments, type, iframe);
-                        return target[property].apply(target, arguments);
-                    }
-                }
+                if (property === "postMessage") return hookFunction(target[property], type, true, iframe);
                 let object = {};
                 try {
                     object = Reflect.get(...arguments);
