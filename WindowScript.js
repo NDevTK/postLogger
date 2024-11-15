@@ -51,12 +51,12 @@
     function whois(win, origin) {
         const source = useProxy(win);
         const target = displayOrigin(origin);
-        if (source === realTop) return 'top (' + target + ')';
+        if (source.window === window.top) return 'top (' + target + ')';
         if (source === window.parent && source !== window) return 'parent (' + target + ')';
         if (source === window.opener) return 'opener (' + target + ')';
 
-        if (source.opener === window && source === source.top) return 'popup (' + target + ')';
-        if (source.opener === window && source !== source.top) return 'popup iframe (' + target + ')';
+        if (source.opener === window && source.window === source.top.window) return 'popup (' + target + ')';
+        if (source.opener === window && source.window !== source.top.window) return 'popup iframe (' + target + ')';
 
         if (window.opener?.opener === window) return 'opener of opener (' + target + ')';
         if (window.opener?.parent === window && window.opener?.parent !== window.opener) return 'parent of opener (' + target + ')';
