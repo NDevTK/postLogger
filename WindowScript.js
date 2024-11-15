@@ -93,7 +93,7 @@
         const me = whois(window, window.origin);
         console.info(me, "received", e.data, "from", whois(e.source, e.origin));
         uncheckedMessage.add(e);
-        const port = event.ports[0];
+        const port = e.ports[0];
         if (port && !ports.has(port)) {
             ports.add(port);
             port.addEventListener("message", (event) => {
