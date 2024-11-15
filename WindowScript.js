@@ -126,7 +126,7 @@
   function hookFunction(object, type, shouldProxy) {
       const functionProxy = {
           apply: function (target, thisArg, argumentsList) {
-              hook(arguments, type);
+              if (target.name === 'postMessage') hook(arguments, type);
               const result = target.apply(target, arguments);
               return (shouldProxy) ? useProxy(result, handle(type)) : result;
           },
