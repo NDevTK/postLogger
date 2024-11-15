@@ -65,7 +65,7 @@
     }
 
     
-    function hook(data, type, iframe) {
+    function hook(data, type, ref) {
         const me = whois(window, window.origin);
         let scope = data[1];
         let message = data[0];
@@ -77,12 +77,12 @@
         if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");        
         if (type === "popup" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to popup");
         if (type === "popup") return console.info(me, "sent", message, "with scope", scope, "to popup");      
-        if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to iframe", iframe);
-        if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", iframe);
+        if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to iframe", ref);
+        if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", ref);
         if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to message source");
         if (type === "source") return console.info(me, "sent", message, "with scope", scope, "to message source");
-        if (type === "MessageChannel" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to MessageChannel");
-        if (type === "MessageChannel") return console.info(me, "sent", message, "with scope", scope, "to MessageChannel");
+        if (type === "MessageChannel" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to MessageChannel", ref);
+        if (type === "MessageChannel") return console.info(me, "sent", message, "with scope", scope, "to MessageChannel", ref);
         if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to parent");
         if (type === "parent") return console.info(me, "sent", message, "with scope", scope, "to parent");
         return console.info(me, "sent", message, "with scope", scope, "to other");
@@ -124,11 +124,11 @@
       } catch {}
   }
 
-  function hookFunction(object, type, shouldProxy, iframe) {
+  function hookFunction(object, type, shouldProxy) {
       const functionProxy = {
           apply: function (target, thisArg, argumentsList) {
               if (target.name === 'postMessage') {
-                  hook(argumentsList, type, iframe);
+                  hook(argumentsList, type, target);
               }
               const result = Reflect.apply(...arguments);
               return (shouldProxy) ? useProxy(result, handle(type)) : result;
