@@ -86,11 +86,20 @@
         if (type === "parent") return console.info(me, "sent", message, "with scope", scope, "to parent");
         return console.info(me, "sent", message, "with scope", scope, "to other");
     }
-
+    
+    const ports = new WeakSet();
+    
     window.addEventListener("message", e => {
         const me = whois(window, window.origin);
         console.info(me, "received", e.data, "from", whois(e.source, e.origin));
         uncheckedMessage.add(e);
+        const port = event.ports[0];
+        if (port && !ports.has(port)) {
+            ports.add(port);
+            port.addEventListener("message", (event) => {
+                console.info(me, "received", e.data, "from", whois(e.source, e.origin), "via MessageChannel");
+            });
+        }
         setTimeout(() => {
             if (!uncheckedMessage.has(e)) return;
             console.warn(me, "did not verify", e.data, "from", whois(e.source, e.origin));
