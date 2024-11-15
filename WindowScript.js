@@ -91,18 +91,19 @@
     
     window.addEventListener("message", e => {
         const me = whois(window, window.origin);
-        console.info(me, "received", e.data, "from", whois(e.source, e.origin));
+        const source = whois(e.source, e.origin);
+        console.info(me, "received", e.data, "from", source);
         uncheckedMessage.add(e);
         const port = e.ports[0];
         if (port && !ports.has(port)) {
             ports.add(port);
             port.addEventListener("message", (e) => {
-                console.info(me, "received", e.data, "from", whois(e.source, e.origin), "via MessageChannel");
+                console.info(me, "received", e.data, "from", source, "via MessageChannel");
             });
         }
         setTimeout(() => {
             if (!uncheckedMessage.has(e)) return;
-            console.warn(me, "did not verify", e.data, "from", whois(e.source, e.origin));
+            console.warn(me, "did not verify", e.data, "from", source);
             uncheckedMessage.delete(e);
         }, 2000);
     });
