@@ -5,6 +5,7 @@ Extension to log postMessage()
 - detects the scope of sent messages.
 - origins that are insecure due to being a sandbox domain or a wildcard, will be prefixed with UNSAFE.
 - detects if a website does not check MessageEvent.origin
+- MessageChannel API
 
 
 # Warning
