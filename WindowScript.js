@@ -5,7 +5,6 @@
     const proxies = new WeakMap();
     const iframes = new WeakSet();
     const uncheckedMessage = new Set();
-    const realOpen = window.open;
     const realParent = window.parent;
     const realTop = window.top;
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
@@ -80,8 +79,10 @@
         if (type === "popup") return console.info(me, "sent", message, "with scope", scope, "to popup");      
         if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to iframe", iframe);
         if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", iframe);
-        if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to message source", iframe);
-        if (type === "source") return console.info(me, "sent", message, "with scope", scope, "to message source", iframe);
+        if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to message source");
+        if (type === "source") return console.info(me, "sent", message, "with scope", scope, "to message source");
+        if (type === "MessageChannel" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to MessageChannel");
+        if (type === "MessageChannel") return console.info(me, "sent", message, "with scope", scope, "to MessageChannel");
         if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to parent");
         if (type === "parent") return console.info(me, "sent", message, "with scope", scope, "to parent");
         return console.info(me, "sent", message, "with scope", scope, "to other");
@@ -148,12 +149,6 @@
     setInterval(() => {
         document.querySelectorAll('iframe').forEach(hookIframe);
     }, 100);
-
-    function openHook(url) {
-        const win = realOpen(url);
-        if (!win) return win;
-        return useProxy(win, handle('popup'));
-    }
     
     function handle(type, iframe) {
         return {
