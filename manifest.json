@@ -2,6 +2,7 @@
   "name": "postLogger",
   "version": "1.0",
   "description": "Extension to log postMessage()",
+  "icons": {"48": "icon48.png"},
   "content_scripts": [
     {
       "all_frames": true,
