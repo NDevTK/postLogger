@@ -49,19 +49,16 @@
     
     function whois(source, origin) {
         const target = displayOrigin(origin);
+        // .window is used to get the non-proxied version.
         if (source.window === window.top) return 'top (' + target + ')';
-        if (source === window.parent && source !== window) return 'parent (' + target + ')';
+        if (source === window.parent) return 'parent (' + target + ')';
         if (source === window.opener) return 'opener (' + target + ')';
-
-        if (source.opener === window && source.window === source.top.window) return 'popup (' + target + ')';
-        if (source.opener === window && source.window !== source.top.window) return 'popup iframe (' + target + ')';
-
-        // We cant hook window.top so it always provides the non-proxied value.
-        if (source.parent === source && realParent !== realTop) return 'nested iframe (' + target + ')';
-        if (source.parent !== source && realParent === realTop) return 'iframe (' + target + ')';
+        if (source.opener === window) return 'popup (' + target + ')';
+        if (source.top.opener === window && source.window !== source.top.window) return 'popup iframe (' + target + ')';
+        if (source.top === window && window.parent.window !== window.top) return 'nested iframe (' + target + ')';
+        if (source.top === window && window.parent.window === window.top) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
-
     
     function hook(data, type, ref) {
         const me = whois(window, window.origin);
