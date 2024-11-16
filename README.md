@@ -1,5 +1,6 @@
 # postLogger
-![Extension icon](preview.png)
+![Extension screenshot](preview.png)
+![Extension screenshot](origincheck.png)
 Extension to log postMessage()
 - console.info for postMessages from all_frames.
 - detects the scope of sent messages.
