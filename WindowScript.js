@@ -5,8 +5,6 @@
     const proxies = new WeakMap();
     const iframes = new WeakSet();
     const uncheckedMessage = new Set();
-    const realParent = window.parent;
-    const realTop = window.top;
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 
     // Adds proxy to MessageEvent.source
