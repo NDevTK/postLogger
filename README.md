@@ -9,4 +9,4 @@ Extension to log postMessage()
 
 
 # Warning
-May cause unexpected behavour, if you find a security issues contact me.
+May cause unexpected behavour, if you find a security issue contact me.
