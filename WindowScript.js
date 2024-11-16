@@ -81,8 +81,7 @@
         if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", ref);
         if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to message source");
         if (type === "source") return console.info(me, "sent", message, "with scope", scope, "to message source");
-        if (type === "MessageChannel" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to MessageChannel", ref);
-        if (type === "MessageChannel") return console.info(me, "sent", message, "with scope", scope, "to MessageChannel", ref);
+        if (type === "MessageChannel") return console.info(me, "sent", message, "to MessageChannel", ref);
         if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to parent");
         if (type === "parent") return console.info(me, "sent", message, "with scope", scope, "to parent");
         return console.info(me, "sent", message, "with scope", scope, "to other");
