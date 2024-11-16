@@ -165,5 +165,6 @@
     }
     MessagePort.prototype.postMessage = hookFunction(MessagePort.prototype.postMessage, 'MessageChannel');
     window.opener = useProxy(window.opener, handle('opener'));
+    window.self = useProxy(window.self, handle('self'));
     window.open = hookFunction(window.open, 'popup', true);
 })();
