@@ -1,0 +1,27 @@
+{
+  "name": "postLogger",
+  "version": "1.1",
+  "description": "Extension to log postMessage()",
+  "icons": {"48": "icon48.png"},
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "run_at": "document_start",
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "WindowScript.js"
+      ],
+      "world": "MAIN"
+    }
+  ],
+  "browser_specific_settings":{
+    "gecko":{
+      "id":"postlogger@ndevtk"
+    }
+  },
+  "manifest_version": 3
+}
