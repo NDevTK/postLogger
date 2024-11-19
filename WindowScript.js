@@ -28,6 +28,7 @@
     
     function useProxy(object, handler) {
         if (!object) return object;
+        if (window.top === object) return object;
         if (proxies.has(object)) {
             return proxies.get(object);
         }
