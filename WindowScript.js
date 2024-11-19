@@ -128,15 +128,6 @@
       };
       return useProxy(object, functionProxy);
   }
-
-    // Adds proxy when addEventListener is used on iframe.
-    const addEvent = EventTarget.prototype.addEventListener;
-    EventTarget.prototype.addEventListener = function() {
-        if (this instanceof HTMLIFrameElement) {
-            hookIframe(this);
-        }
-        return addEvent.apply(this, arguments);
-    }
     
     setInterval(() => {
         document.querySelectorAll('iframe').forEach(hookIframe);
