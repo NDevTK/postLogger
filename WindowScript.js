@@ -120,7 +120,7 @@
       const functionProxy = {
           apply: function (target, thisArg, argumentsList) {
               if (target.name === 'postMessage') {
-                  hook(argumentsList, type, target);
+                  hook(argumentsList, type, thisArg);
               }
               const result = Reflect.apply(...arguments);
               return (shouldProxy) ? useProxy(result, handle(type)) : result;
