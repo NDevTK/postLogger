@@ -53,8 +53,8 @@
         if (source === window.opener) return 'opener (' + target + ')';
         if (source.opener === window) return 'popup (' + target + ')';
         if (source.top.opener === window && source.window !== source.top.window) return 'popup iframe (' + target + ')';
-        if (source.top === window.top && window.parent.window !== window.top) return 'nested iframe (' + target + ')';
-        if (source.top === window.top && window.parent.window === window.top) return 'iframe (' + target + ')';
+        if (source.top === window.top && window.parent?.window !== window.top) return 'nested iframe (' + target + ')';
+        if (source.top === window.top && window.parent?.window === window.top) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
     
