@@ -5,12 +5,14 @@
     const proxies = new WeakMap();
     const iframes = new WeakSet();
     const uncheckedMessage = new Set();
+    const uncheckedSource = new Set();
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 
     // Adds proxy to MessageEvent.source
     const sourceDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'source');
     const get = sourceDescriptor.get;
     sourceDescriptor.get = function() {
+        uncheckedSource.delete(this);
         const source = get.call(this);
         return useProxy(source, handle('source'));
     };
@@ -89,6 +91,7 @@
         const source = whois(e.source, e.origin);
         console.info(me, "received", e.data, "from", source);
         uncheckedMessage.add(e);
+        uncheckedSource.add(e);
         const port = e.ports[0];
         if (port && !ports.has(port)) {
             ports.add(port);
@@ -98,7 +101,12 @@
         }
         setTimeout(() => {
             if (!uncheckedMessage.has(e)) return;
-            console.warn(me, "did not verify", e.data, "from", source);
+            if (uncheckedSource.has(e)) {
+                console.warn(me, "did not verify or lookup source", e.data, "from", source);
+                uncheckedSource.delete(e);
+            } else {
+                console.warn(me, "did not verify", e.data, "from", source);
+            }
             uncheckedMessage.delete(e);
         }, 2000);
     });
