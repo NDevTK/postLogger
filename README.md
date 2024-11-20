@@ -8,6 +8,8 @@ Extension to log postMessage()
 - detects if a website does not check MessageEvent.origin
 - MessageChannel API
 
+https://chrome.google.com/webstore/detail/aodfhblfhpcdadgcnpkfibjgjdoenoja
+https://addons.mozilla.org/en-US/firefox/addon/postlogger/
 
 # Warning
 May cause unexpected behavour, if you find a security issue contact me.
