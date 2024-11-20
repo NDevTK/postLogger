@@ -6,8 +6,18 @@
     const iframes = new WeakSet();
     const uncheckedMessage = new Set();
     const uncheckedSource = new Set();
+    const unusedMessages = new Set();
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
-
+   
+    // Adds proxy to MessageEvent.data
+    const dataDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'data');
+    const getData = dataDescriptor.get;
+    dataDescriptor.get = function() {
+        unusedMessages.delete(this);
+        return getData.call(this);
+    };
+    Object.defineProperty(window.MessageEvent.prototype, 'data', dataDescriptor);
+    
     // Adds proxy to MessageEvent.source
     const sourceDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'source');
     const get = sourceDescriptor.get;
@@ -92,6 +102,7 @@
         console.info(me, "received", e.data, "from", source);
         uncheckedMessage.add(e);
         uncheckedSource.add(e);
+        unusedMessages.add(e);
         const port = e.ports[0];
         if (port && !ports.has(port)) {
             ports.add(port);
@@ -101,13 +112,15 @@
         }
         setTimeout(() => {
             if (!uncheckedMessage.has(e)) return;
+            const prefix = (unusedMessages.has(e)) ? 'unused' : 'used';
             if (uncheckedSource.has(e)) {
-                console.warn(me, "did not verify or lookup source", e.data, "from", source);
+                console.warn(me, prefix + " did not verify or lookup source", e.data, "from", source);
                 uncheckedSource.delete(e);
             } else {
-                console.warn(me, "did not verify", e.data, "from", source);
+                console.warn(me, prefix + "did not verify", e.data, "from", source);
             }
             uncheckedMessage.delete(e);
+            unusedMessages.delete(e);
         }, 2000);
     });
 
