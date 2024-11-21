@@ -9,7 +9,7 @@
     const unusedMessages = new Set();
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
    
-    // Adds proxy to MessageEvent.data
+    // Detects when MessageEvent.data is used.
     const dataDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'data');
     const getData = dataDescriptor.get;
     dataDescriptor.get = function() {
