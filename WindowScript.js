@@ -117,7 +117,7 @@
                 console.warn(me, prefix + " did not verify or lookup source", e.data, "from", source);
                 uncheckedSource.delete(e);
             } else {
-                console.warn(me, prefix + "did not verify", e.data, "from", source);
+                console.warn(me, prefix + " did not verify", e.data, "from", source);
             }
             uncheckedMessage.delete(e);
             unusedMessages.delete(e);
