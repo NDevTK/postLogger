@@ -161,7 +161,7 @@
                 }
             }
         }
-    }).observe(document.body, {childList: true, subtree: true});
+    }).observe(document.documentElement, {childList: true, subtree: true});
     
     function handle(type, iframe) {
         return {
