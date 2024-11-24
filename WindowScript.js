@@ -152,9 +152,16 @@
       return useProxy(object, functionProxy);
   }
     
-    setInterval(() => {
-        document.querySelectorAll('iframe').forEach(hookIframe);
-    }, 100);
+    document.querySelectorAll('iframe').forEach(hookIframe);
+    new MutationObserver(async records => {
+        for (let record of records) {
+            for (let node of record.addedNodes) {
+                if (node.tagName === 'IFRAME') {
+                    hookIframe(node);
+                }
+            }
+        }
+    }).observe(document.body, {childList: true, subtree: true});
     
     function handle(type, iframe) {
         return {
