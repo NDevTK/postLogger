@@ -8,7 +8,16 @@
     const uncheckedSource = new Set();
     const unusedMessages = new Set();
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
-   
+    
+    // Detects when MessageEvent.ports is used.
+    const portsDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'ports');
+    const getPorts = portsDescriptor.get;
+    portsDescriptor.get = function() {
+        unusedMessages.delete(this);
+        return getPorts.call(this);
+    };
+    Object.defineProperty(window.MessageEvent.prototype, 'ports', portsDescriptor);
+    
     // Detects when MessageEvent.data is used.
     const dataDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'data');
     const getData = dataDescriptor.get;
