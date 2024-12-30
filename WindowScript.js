@@ -162,16 +162,28 @@
   }
     
     document.querySelectorAll('iframe').forEach(hookIframe);
-    new MutationObserver(async records => {
-        for (let record of records) {
-            for (let node of record.addedNodes) {
-                if (node.tagName === 'IFRAME') {
-                    hookIframe(node);
+
+    function iframeFinder(doc) {
+        new MutationObserver(async records => {
+            for (let record of records) {
+                for (let node of record.addedNodes) {
+                    if (node.tagName === 'IFRAME') {
+                        hookIframe(node);
+                    }
                 }
             }
-        }
-    }).observe(document.documentElement, {childList: true, subtree: true});
+        }).observe(doc, {childList: true, subtree: true});
+    }
     
+    iframeFinder(document.documentElement);
+    
+    const attachShadow = Element.prototype.attachShadow;
+    Element.prototype.attachShadow = function(options) {
+        const shadowRoot = attachShadow.call(this, options);
+        iframeFinder(shadowRoot);
+        return shadowRoot;
+    };
+
     function handle(type, iframe) {
         return {
             get: function(target, property) {
