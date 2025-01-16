@@ -62,6 +62,7 @@
     function displayOrigin(origin) {
         if (origin === 'null') return 'OPAQUE ' + origin;
         if (origin === '*') return 'UNSAFE ' + origin;
+        if (origin === 'http://localhost' || origin.startsWith('http://localhost:') || origin === 'http://127.0.0.1' || origin.startsWith('http://127.0.0.1:')) return 'LOCAL ' + origin;
         if (origin.startsWith('http://')) return 'UNSAFE ' + origin;
         if (anarchyDomains.has(origin)) return 'UNSAFE ' + origin;
         return origin;
