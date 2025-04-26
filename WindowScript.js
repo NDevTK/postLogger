@@ -85,10 +85,17 @@
         const me = whois(window, window.origin);
         let scope = data[1];
         let message = data[0];
+        let from = 'unknown';
+        
         if (typeof scope === 'object') scope = scope.targetOrigin;
         // If omitted, then defaults to the origin that is calling the method.
         if (typeof scope !== 'string') scope = window.origin;
         scope = displayOrigin(scope);
+
+        if (type === "MessageChannel" && ports.has(ref)) {
+            from = ports.get(ref);
+        }
+        
         if (type === "self") return console.info(me, "sent", message, "with scope", scope, "to self");
         if (type === "opener" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to opener");
         if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");        
@@ -98,13 +105,13 @@
         if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", ref);
         if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to message source");
         if (type === "source") return console.info(me, "sent", message, "with scope", scope, "to message source");
-        if (type === "MessageChannel") return console.info(me, "sent", message, "to MessageChannel", ref);
+        if (type === "MessageChannel") return console.info(me, "sent", message, "to MessageChannel from ", from, ref);
         if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to parent");
         if (type === "parent") return console.info(me, "sent", message, "with scope", scope, "to parent");
         return console.info(me, "sent", message, "with scope", scope, "to other");
     }
     
-    const ports = new WeakSet();
+    const ports = new WeakMap();
     
     window.addEventListener("message", e => {
         const me = whois(window, window.origin);
@@ -115,7 +122,7 @@
         unusedMessages.add(e);
         const port = e.ports[0];
         if (port && !ports.has(port)) {
-            ports.add(port);
+            ports.set(port, source);
             port.addEventListener("message", (e) => {
                 console.info(me, "received", e.data, "from", source, "via MessageChannel");
             });
