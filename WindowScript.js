@@ -119,7 +119,6 @@
         console.info(me, "received", e.data, "from", source);
         uncheckedMessage.add(e);
         uncheckedSource.add(e);
-        unusedMessages.add(e);
         const port = e.ports[0];
         if (port && !ports.has(port)) {
             ports.set(port, source);
@@ -127,6 +126,7 @@
                 console.info(me, "received", e.data, "from", source, "via MessageChannel");
             });
         }
+        unusedMessages.add(e);
         setTimeout(() => {
             if (!uncheckedMessage.has(e)) return;
             const prefix = (unusedMessages.has(e)) ? 'unused' : 'used';
