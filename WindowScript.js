@@ -116,7 +116,6 @@
     window.addEventListener("message", e => {
         const me = whois(window, window.origin);
         const source = whois(e.source, e.origin);
-        console.info(me, "received", e.data, "from", source);
         uncheckedMessage.add(e);
         uncheckedSource.add(e);
         const port = e.ports[0];
@@ -128,8 +127,9 @@
         }
         unusedMessages.add(e);
         setTimeout(() => {
-            if (!uncheckedMessage.has(e)) return;
             const prefix = (unusedMessages.has(e)) ? 'unused' : 'used';
+            console.info(me, prefix + " received", e.data, "from", source);
+            if (!uncheckedMessage.has(e)) return;
             if (uncheckedSource.has(e)) {
                 console.warn(me, prefix + " did not verify or lookup source", e.data, "from", source);
                 uncheckedSource.delete(e);
