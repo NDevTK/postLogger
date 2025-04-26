@@ -82,6 +82,8 @@
     }
     
     function hook(data, type, ref) {
+        console.trace();
+        
         const me = whois(window, window.origin);
         let scope = data[1];
         let message = data[0];
