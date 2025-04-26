@@ -85,7 +85,7 @@
         const me = whois(window, window.origin);
         let scope = data[1];
         let message = data[0];
-        let from = 'unknown';
+        let from = 'self';
         
         if (typeof scope === 'object') scope = scope.targetOrigin;
         // If omitted, then defaults to the origin that is calling the method.
