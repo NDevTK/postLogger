@@ -128,8 +128,12 @@
         unusedMessages.add(e);
         setTimeout(() => {
             const prefix = (unusedMessages.has(e)) ? 'unused' : 'used';
-            console.info(me, prefix + " received", e.data, "from", source);
-            if (!uncheckedMessage.has(e)) return;
+
+            if (!uncheckedMessage.has(e)) {
+                console.info(me, prefix + " received", e.data, "from", source);
+                return
+            }
+            
             if (uncheckedSource.has(e)) {
                 console.warn(me, prefix + " did not verify or lookup source", e.data, "from", source);
                 uncheckedSource.delete(e);
