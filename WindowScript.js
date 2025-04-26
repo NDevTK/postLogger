@@ -142,7 +142,7 @@
             }
             uncheckedMessage.delete(e);
             unusedMessages.delete(e);
-        }, 2000);
+        }, 1000);
     });
 
   function hookIframe(iframe) {
