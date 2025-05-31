@@ -1,5 +1,6 @@
 // Code here is exposed to the website.
 (function() {
+    const handledByPostLoggerSymbol = Symbol.for('postLoggerHandled'); // Use Symbol.for for wider accessibility if needed, or just Symbol.
     'use strict';
 
     const proxies = new WeakMap();
@@ -7,7 +8,7 @@
     const uncheckedMessage = new Set();
     const uncheckedSource = new Set();
     const unusedMessages = new Set();
-    const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
+    const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com', 'https://www.google.com']); // Added google.com for testing example
     
     // Detects when MessageEvent.ports is used.
     const portsDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'ports');
@@ -198,18 +199,38 @@
         return shadowRoot;
     };
 
-    function handle(type, iframe) {
+    function handle(type, iframe) { // iframe is the original object, like the actual iframe DOM element for 'iframe' type, or the window object for 'parent' type.
         return {
-            get: function(target, property) {
-                if (property === "postMessage") {
+            get: function(target, property, receiver) { // target is the actual window object, receiver is the proxy.
+                // target is the actual window object (e.g. window.parent, event.source)
+                // property is 'postMessage'
+                // receiver is the proxy object itself
+                if (property === "postMessage" && typeof target[property] === 'function') {
+                    const originalTargetPostMessage = target[property]; // Native postMessage of the target
                     return function() {
-                        hook(arguments, type, iframe);
-                        return target[property].apply(target, arguments);
+                        const currentCallArguments = arguments;
+                        // If already handled by the global Window.prototype.postMessage proxy,
+                        // just call the original method on the target.
+                        if (currentCallArguments[handledByPostLoggerSymbol]) {
+                            return Reflect.apply(originalTargetPostMessage, target, currentCallArguments);
+                        }
+                        // Mark that this specific proxy handle is processing it.
+                        Object.defineProperty(currentCallArguments, handledByPostLoggerSymbol, { value: true, configurable: true });
+
+                        hook(currentCallArguments, type, target); // Pass target as ref
+                        let result = Reflect.apply(originalTargetPostMessage, target, currentCallArguments);
+                        delete currentCallArguments[handledByPostLoggerSymbol]; // Clean up
+                        return result;
                     }
                 }
+                // Handle other properties
                 try {
-                    return Reflect.get(...arguments);
-                } catch {
+                    return Reflect.get(target, property, receiver);
+                } catch (e) { // Catch errors during Reflect.get (e.g. illegal invocation)
+                    // Fallback to direct property access if Reflect.get fails
+                    if (typeof target[property] === 'function') {
+                        return target[property].bind(target); // Bind if it's a function
+                    }
                     return target[property];
                 }
             },
@@ -219,7 +240,47 @@
     if (window !== window.parent) {
         window.parent = useProxy(window.parent, handle('parent'));
     }
-    MessagePort.prototype.postMessage = hookFunction(MessagePort.prototype.postMessage, 'MessageChannel');
+    // MessagePort.prototype.postMessage is already a function, not an object property to be proxied by 'handle'
+    // hookFunction is designed for functions like window.open or MessagePort.prototype.postMessage
+    // Ensure hookFunction also respects and sets the handledByPostLoggerSymbol if its target.name is 'postMessage'
+    const originalMessagePortPostMessage = MessagePort.prototype.postMessage;
+    MessagePort.prototype.postMessage = function() { // arguments of this call
+        const currentCallArguments = arguments;
+        if (currentCallArguments[handledByPostLoggerSymbol]) {
+            return Reflect.apply(originalMessagePortPostMessage, this, currentCallArguments);
+        }
+        Object.defineProperty(currentCallArguments, handledByPostLoggerSymbol, { value: true, configurable: true });
+        hook(currentCallArguments, 'MessageChannel', this); // 'this' is the MessagePort instance
+        let result = Reflect.apply(originalMessagePortPostMessage, this, currentCallArguments);
+        delete currentCallArguments[handledByPostLoggerSymbol];
+        return result;
+    };
+
     window.opener = useProxy(window.opener, handle('opener'));
     window.open = hookFunction(window.open, 'popup', true);
+
+    // Globally proxy Window.prototype.postMessage
+    const originalWindowPostMessage = Window.prototype.postMessage;
+    Window.prototype.postMessage = new Proxy(originalWindowPostMessage, {
+        apply: function(target, thisArg, argumentsList) { // thisArg is the window on which postMessage was called
+            if (argumentsList[handledByPostLoggerSymbol]) {
+                return Reflect.apply(originalWindowPostMessage, thisArg, argumentsList);
+            }
+            Object.defineProperty(argumentsList, handledByPostLoggerSymbol, { value: true, configurable: true });
+            hook(argumentsList, 'prototype', thisArg); // 'prototype' type, 'thisArg' is the window itself
+            let result = Reflect.apply(originalWindowPostMessage, thisArg, argumentsList);
+            delete argumentsList[handledByPostLoggerSymbol];
+            return result;
+        }
+    });
+
+    // Enforcement block from the prompt for window.top
+    if (window.top && typeof window.top.postMessage === 'function' && window.top.postMessage !== Window.prototype.postMessage) {
+        try {
+            Object.defineProperty(window.top, 'postMessage', {
+                value: Window.prototype.postMessage, // Assign the proxied version from prototype
+                configurable: true, enumerable: true, writable: true
+            });
+        } catch (e) { /* Error handling: console.error might not be safe here depending on injection context */ }
+    }
 })();
