@@ -11,11 +11,5 @@ Extension to log postMessage()
 https://chrome.google.com/webstore/detail/aodfhblfhpcdadgcnpkfibjgjdoenoja
 https://addons.mozilla.org/en-US/firefox/addon/postlogger/
 
-## Security
-
-This extension is designed to help developers and security researchers understand `postMessage` usage on web pages.
-We take security seriously. A security audit of this extension has been performed, and the findings are documented in the [SECURITY.md](security.md) file.
-Please review this document for details on the security aspects of this extension and recommendations. If you discover any security vulnerabilities, please report them responsibly.
-
 # Warning
 May cause unexpected behavour, if you find a security issue contact me.
