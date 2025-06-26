@@ -47,6 +47,19 @@
     };
     Object.defineProperty(window.MessageEvent.prototype, 'origin', originDescriptor);
     
+    function classifyMessage(message, scope, type) {
+        if (typeof message === 'string' && message.includes('<script>')) {
+            return "Potential XSS";
+        }
+        if (typeof message === 'string') {
+            const lowerMessage = message.toLowerCase();
+            if (lowerMessage.includes("password") || lowerMessage.includes("credit card") || lowerMessage.includes("ssn")) {
+                return "Potential Sensitive Data";
+            }
+        }
+        return "General Information";
+    }
+
     function useProxy(object, handler) {
         if (!object) return object;
         if (window === object) return object;
@@ -88,6 +101,7 @@
         let scope = data[1];
         let message = data[0];
         let from = 'self';
+        const classification = classifyMessage(message, scope, type);
         
         if (typeof scope === 'object') scope = scope.targetOrigin;
         // If omitted, then defaults to the origin that is calling the method.
@@ -98,19 +112,19 @@
             from = ports.get(ref);
         }
         
-        if (type === "self") return console.info(me, "sent", message, "with scope", scope, "to self");
-        if (type === "opener" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to opener");
-        if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");        
-        if (type === "popup" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to popup");
-        if (type === "popup") return console.info(me, "sent", message, "with scope", scope, "to popup");      
-        if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to iframe", ref);
-        if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", ref);
-        if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to message source");
-        if (type === "source") return console.info(me, "sent", message, "with scope", scope, "to message source");
-        if (type === "MessageChannel") return console.info(me, "sent", message, "to MessageChannel from ", from, ref);
-        if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to parent");
-        if (type === "parent") return console.info(me, "sent", message, "with scope", scope, "to parent");
-        return console.info(me, "sent", message, "with scope", scope, "to other");
+        if (type === "self") return console.info("[" + classification + "]", me, "sent", message, "with scope", scope, "to self");
+        if (type === "opener" && scope === "*") return console.warn("[" + classification + "]", me, "sent", message, "with scope", scope, "to opener");
+        if (type === "opener") return console.info("[" + classification + "]", me, "sent", message, "with scope", scope, "to opener");
+        if (type === "popup" && scope === "*") return console.warn("[" + classification + "]", me, "sent", message, "with scope", scope, "to popup");
+        if (type === "popup") return console.info("[" + classification + "]", me, "sent", message, "with scope", scope, "to popup");
+        if (type === "iframe" && scope === "*") return console.warn("[" + classification + "]", me, "sent", message, "with scope", scope, "to iframe", ref);
+        if (type === "iframe") return console.info("[" + classification + "]", me, "sent", message, "with scope", scope, "to iframe", ref);
+        if (type === "source" && scope === "*") return console.warn("[" + classification + "]", me, "sent", message, "with scope", scope, "to message source");
+        if (type === "source") return console.info("[" + classification + "]", me, "sent", message, "with scope", scope, "to message source");
+        if (type === "MessageChannel") return console.info("[" + classification + "]", me, "sent", message, "to MessageChannel from ", from, ref);
+        if (type === "parent" && scope === "*") return console.warn("[" + classification + "]", me, "sent", message, "with scope", scope, "to parent");
+        if (type === "parent") return console.info("[" + classification + "]", me, "sent", message, "with scope", scope, "to parent");
+        return console.info("[" + classification + "]", me, "sent", message, "with scope", scope, "to other");
     }
     
     const ports = new WeakMap();
