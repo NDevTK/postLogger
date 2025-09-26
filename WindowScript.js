@@ -92,25 +92,26 @@
         if (typeof scope === 'object') scope = scope.targetOrigin;
         // If omitted, then defaults to the origin that is calling the method.
         if (typeof scope !== 'string') scope = window.origin;
-        scope = displayOrigin(scope);
+        
+        const target = displayOrigin(scope);
 
         if (type === "MessageChannel" && ports.has(ref)) {
             from = ports.get(ref);
         }
         
-        if (type === "self") return console.info(me, "sent", message, "with scope", scope, "to self");
-        if (type === "opener" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to opener");
+        if (type === "self") return console.info(me, "sent", message, "with scope", target, "to self");
+        if (type === "opener" && scope === "*") return console.warn(me, "sent", message, "with scope", target, "to opener");
         if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");        
-        if (type === "popup" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to popup");
-        if (type === "popup") return console.info(me, "sent", message, "with scope", scope, "to popup");      
-        if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to iframe", ref);
-        if (type === "iframe") return console.info(me, "sent", message, "with scope", scope, "to iframe", ref);
-        if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to message source");
-        if (type === "source") return console.info(me, "sent", message, "with scope", scope, "to message source");
+        if (type === "popup" && scope === "*") return console.warn(me, "sent", message, "with scope", target, "to popup");
+        if (type === "popup") return console.info(me, "sent", message, "with scope", target, "to popup");      
+        if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", target, "to iframe", ref);
+        if (type === "iframe") return console.info(me, "sent", message, "with scope", target, "to iframe", ref);
+        if (type === "source" && scope === "*") return console.warn(me, "sent", message, "with scope", target, "to message source");
+        if (type === "source") return console.info(me, "sent", message, "with scope", target, "to message source");
         if (type === "MessageChannel") return console.info(me, "sent", message, "to MessageChannel from ", from, ref);
-        if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", scope, "to parent");
-        if (type === "parent") return console.info(me, "sent", message, "with scope", scope, "to parent");
-        return console.info(me, "sent", message, "with scope", scope, "to other");
+        if (type === "parent" && scope === "*") return console.warn(me, "sent", message, "with scope", target, "to parent");
+        if (type === "parent") return console.info(me, "sent", message, "with scope", target, "to parent");
+        return console.info(me, "sent", message, "with scope", target, "to other");
     }
     
     const ports = new WeakMap();
