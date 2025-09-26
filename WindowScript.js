@@ -101,7 +101,7 @@
         
         if (type === "self") return console.info(me, "sent", message, "with scope", target, "to self");
         if (type === "opener" && scope === "*") return console.warn(me, "sent", message, "with scope", target, "to opener");
-        if (type === "opener") return console.info(me, "sent", message, "with scope", scope, "to opener");        
+        if (type === "opener") return console.info(me, "sent", message, "with scope", target, "to opener");        
         if (type === "popup" && scope === "*") return console.warn(me, "sent", message, "with scope", target, "to popup");
         if (type === "popup") return console.info(me, "sent", message, "with scope", target, "to popup");      
         if (type === "iframe" && scope === "*") return console.warn(me, "sent", message, "with scope", target, "to iframe", ref);
