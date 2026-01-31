@@ -176,7 +176,9 @@
       return useProxy(object, functionProxy);
   }
     
-    document.querySelectorAll('iframe').forEach(hookIframe);
+    for (const iframe of document.getElementsByTagName('iframe')) {
+        hookIframe(iframe);
+    }
 
     function iframeFinder(doc) {
         new MutationObserver(async records => {
