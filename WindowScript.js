@@ -181,7 +181,7 @@
     }
 
     function iframeFinder(doc) {
-        new MutationObserver(async records => {
+        new MutationObserver(records => {
             for (let record of records) {
                 for (let node of record.addedNodes) {
                     if (node.tagName === 'IFRAME') {
