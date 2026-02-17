@@ -8,6 +8,7 @@
     const uncheckedSource = new Set();
     const unusedMessages = new Set();
     const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
+    const originalTop = window.top;
     
     // Detects when MessageEvent.ports is used.
     const portsDescriptor = Object.getOwnPropertyDescriptor(window.MessageEvent.prototype, 'ports');
@@ -71,13 +72,13 @@
     function whois(source, origin) {
         const target = displayOrigin(origin);
         // .window is used to get the non-proxied version.
-        if (source.window === window.top) return 'top (' + target + ')';
+        if (source.window === originalTop) return 'top (' + target + ')';
         if (source === window.parent) return 'parent (' + target + ')';
         if (source === window.opener) return 'opener (' + target + ')';
         if (source.opener === window) return 'popup (' + target + ')';
         if (source.top.opener === window && source.window !== source.top.window) return 'popup iframe (' + target + ')';
-        if (source.top === window.top && window.parent?.window !== window.top) return 'nested iframe (' + target + ')';
-        if (source.top === window.top && window.parent?.window === window.top) return 'iframe (' + target + ')';
+        if (source.top === originalTop && window.parent?.window !== originalTop) return 'nested iframe (' + target + ')';
+        if (source.top === originalTop && window.parent?.window === originalTop) return 'iframe (' + target + ')';
         return 'other (' + target + ')';
     }
     
@@ -221,6 +222,16 @@
     
     if (window !== window.parent) {
         window.parent = useProxy(window.parent, handle('parent'));
+    }
+    if (window !== originalTop) {
+        try {
+            Object.defineProperty(window, 'top', {
+                get: function() {
+                    return useProxy(originalTop, handle('parent'));
+                },
+                configurable: true
+            });
+        } catch {}
     }
     MessagePort.prototype.postMessage = hookFunction(MessagePort.prototype.postMessage, 'MessageChannel');
     window.opener = useProxy(window.opener, handle('opener'));
